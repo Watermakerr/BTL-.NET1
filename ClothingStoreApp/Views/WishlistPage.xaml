@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ClothingStoreApp.ViewModels"
+             x:Class="ClothingStoreApp.Views.WishlistPage"
+             BackgroundColor="White"
+             x:Name="ThisPage">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="15" Padding="15">
+                <Label Text="Danh sách yêu thích" 
+                       FontSize="24" 
+                       FontAttributes="Bold" 
+                       HorizontalTextAlignment="Center" 
+                       TextColor="#333333" />
+
+                <!-- Empty State -->
+                <Frame IsVisible="{Binding IsWishlistEmpty}"
+                       CornerRadius="10" 
+                       Padding="15" 
+                       BackgroundColor="#F5F5F5" 
+                       HorizontalOptions="Center" 
+                       VerticalOptions="CenterAndExpand">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Danh sách yêu thích trống" 
+                               FontSize="18" 
+                               FontAttributes="Bold" 
+                               TextColor="#666666" 
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Hãy thêm sản phẩm yêu thích của bạn!" 
+                               FontSize="14" 
+                               TextColor="#666666" 
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Wishlist Products -->
+                <CollectionView ItemsSource="{Binding WishlistProducts}"
+                               IsVisible="{Binding HasWishlistProducts}"
+                               SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame CornerRadius="10" 
+                                   Padding="10" 
+                                   BackgroundColor="White" 
+                                   Margin="0,5"
+                                   HasShadow="True">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:WishlistViewModel}}, Path=NavigateToProductDetailCommand}"
+                                        CommandParameter="{Binding ProductID}" />
+                                </Frame.GestureRecognizers>
+                                <Grid ColumnDefinitions="100,*" ColumnSpacing="10">
+                                    <Image Source="{Binding ImageURL}" 
+                                           Aspect="AspectFill" 
+                                           WidthRequest="80" 
+                                           HeightRequest="80" 
+                                           VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" Spacing="5">
+                                        <Label Text="{Binding ProductName}" 
+                                               FontSize="16" 
+                                               FontAttributes="Bold" 
+                                               TextColor="#333333"
+                                               LineBreakMode="TailTruncation" />
+                                        <Label Text="{Binding Price, StringFormat='Giá: {0:C0}'}" 
+                                               FontSize="14" 
+                                               TextColor="Red" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Tabbar -->
+        <Grid Grid.Row="1" 
+              ColumnDefinitions="*,*,*,*" 
+              BackgroundColor="#F5F5F5" 
+              HeightRequest="60">
+            <Button Text="Home" 
+                    Grid.Column="0" 
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"
+                    Command="{Binding NavigateToHomeCommand}"
+                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+            <Button Text="Giỏ hàng" 
+                    Grid.Column="1" 
+                    BackgroundColor="Transparent" 
+                    TextColor="Black" />
+            <Button Text="Yêu thích" 
+                    Grid.Column="2" 
+                    BackgroundColor="Transparent" 
+                    TextColor="#007BFF" 
+                    FontAttributes="Bold" />
+            <Button Text="Trang cá nhân" 
+                    Grid.Column="3" 
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"/>
+        </Grid>
+    </Grid>
+</ContentPage>

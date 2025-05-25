@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClothingStoreApp.Views.ProductDetailPage"
+             BackgroundColor="White"
+             x:Name="ThisPage">
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="15">
+            <!-- Product Image -->
+            <Frame CornerRadius="10" Padding="0" HeightRequest="300" HorizontalOptions="Center" VerticalOptions="Start">
+                <Image Source="{Binding Product.ImageURL}" Aspect="AspectFit" />
+            </Frame>
+
+            <!-- Product Name -->
+            <Label Text="{Binding Product.ProductName}" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   HorizontalTextAlignment="Center" />
+
+            <!-- Product Price -->
+            <Label Text="{Binding Product.Price, StringFormat='Giá: {0:C0}'}" 
+                   FontSize="20" 
+                   TextColor="Red" 
+                   HorizontalTextAlignment="Center" />
+
+            <!-- Product Details -->
+            <Frame CornerRadius="10" Padding="10" BackgroundColor="#F5F5F5">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Chi tiết sản phẩm" FontSize="18" FontAttributes="Bold" />
+                    <Label Text="{Binding Product.Description}" FontSize="16" LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Action Buttons -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Button Grid.Column="0" 
+                        Text="Thêm vào giỏ hàng" 
+                        BackgroundColor="#007BFF" 
+                        TextColor="White" 
+                        CornerRadius="10" 
+                        Padding="10" />
+                <Button Grid.Column="1" 
+                        Text="{Binding HeartIcon}" 
+                        FontSize="24" 
+                        BackgroundColor="Transparent" 
+                        TextColor="Red" 
+                        BorderColor="Red" 
+                        BorderWidth="1" 
+                        CornerRadius="10" 
+                        WidthRequest="60" 
+                        HorizontalOptions="Center"
+                        Command="{Binding ToggleWishlistCommand}"
+                        CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+            </Grid>
+
+            <!-- Reviews Section -->
+            <Frame CornerRadius="10" Padding="10" BackgroundColor="#F5F5F5">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Đánh giá sản phẩm" FontSize="18" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding Reviews}" 
+                                    HeightRequest="200">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame CornerRadius="5" Padding="10" BackgroundColor="White" Margin="0,5">
+                                    <VerticalStackLayout Spacing="5">
+                                        <Label Text="{Binding Rating, StringFormat='Rating: {0} ★'}" 
+                                               FontSize="16" 
+                                               FontAttributes="Bold" />
+                                        <Label Text="{Binding Comment}" 
+                                               FontSize="14" 
+                                               LineBreakMode="WordWrap" />
+                                        <Label Text="{Binding ReviewDate, StringFormat='Ngày: {0:dd/MM/yyyy HH:mm}'}" 
+                                               FontSize="12" 
+                                               TextColor="Gray" />
+                                    </VerticalStackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
