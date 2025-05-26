@@ -10,7 +10,19 @@
             <VerticalStackLayout Spacing="20" Padding="15">
                 <!-- Thanh tìm kiếm -->
                 <Frame CornerRadius="10" Padding="10" BackgroundColor="#F5F5F5">
-                    <Entry Placeholder="Tìm kiếm sản phẩm..." />
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Entry Placeholder="Tìm kiếm sản phẩm..." 
+                               Text="{Binding SearchQuery}" 
+                               Grid.Column="0" />
+                        <Button Text="Tìm" 
+                                BackgroundColor="#007BFF" 
+                                TextColor="White" 
+                                CornerRadius="5" 
+                                WidthRequest="60" 
+                                Grid.Column="1" 
+                                Command="{Binding SearchCommand}"
+                                CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    </Grid>
                 </Frame>
 
                 <!-- Danh mục -->
@@ -21,6 +33,10 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Frame BackgroundColor="White" CornerRadius="10" Padding="10" WidthRequest="150" HeightRequest="100">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=NavigateToCategoryCommand}"
+                                                          CommandParameter="{Binding CategoryID}" />
+                                </Frame.GestureRecognizers>
                                 <VerticalStackLayout>
                                     <Image Source="{Binding ImagePath}" HeightRequest="60" VerticalOptions="Center" />
                                     <Label Text="{Binding CategoryName}" FontSize="16" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />

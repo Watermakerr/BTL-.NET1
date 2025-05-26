@@ -87,38 +87,6 @@ namespace ClothingStoreApp.Services
             }
         }
 
-        public List<Category> GetCategories()
-        {
-            List<Category> categories = new List<Category>();
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    connection.Open();
-                    string query = "SELECT CategoryID, CategoryName, ImagePath FROM Categories";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                categories.Add(new Category
-                                {
-                                    CategoryID = reader.GetInt32(0),
-                                    CategoryName = reader.GetString(1),
-                                    ImagePath = reader.IsDBNull(2) ? null : reader.GetString(2)
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                // Log lỗi nếu cần
-            }
-            return categories;
-        }
 
         public List<Product> GetTopSellingProducts()
         {
@@ -340,6 +308,125 @@ namespace ClothingStoreApp.Services
             {
                 System.Diagnostics.Debug.WriteLine($"GetWishlistProducts Error: {ex.Message}");
                 throw; // Throw to catch errors during debugging
+            }
+            return products;
+        }
+        public List<Category> GetCategories()
+        {
+            List<Category> categories = new List<Category>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "SELECT CategoryID, CategoryName, ImagePath FROM Categories";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                categories.Add(new Category
+                                {
+                                    CategoryID = reader.GetInt32(0),
+                                    CategoryName = reader.GetString(1),
+                                    ImagePath = reader.IsDBNull(2) ? null : reader.GetString(2)
+                                });
+                            }
+                        }
+                    }
+                }
+                System.Diagnostics.Debug.WriteLine($"GetCategories: Found {categories.Count} categories.");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetCategories Error: {ex.Message}");
+            }
+            return categories;
+        }
+
+        public List<Product> GetProductsBySearch(string searchQuery)
+        {
+            List<Product> products = new List<Product>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = @"
+                        SELECT ProductID, ProductName, Price, QuantitySold, Description, CategoryID, ImageURL
+                        FROM Products
+                        WHERE ProductName LIKE @SearchQuery";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@SearchQuery", $"%{searchQuery}%");
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                products.Add(new Product
+                                {
+                                    ProductID = reader.GetInt32(0),
+                                    ProductName = reader.GetString(1),
+                                    Price = reader.GetDecimal(2),
+                                    QuantitySold = reader.GetInt32(3),
+                                    Description = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                    CategoryID = reader.GetInt32(5),
+                                    ImageURL = reader.IsDBNull(6) ? null : reader.GetString(6)
+                                });
+                            }
+                        }
+                    }
+                }
+                System.Diagnostics.Debug.WriteLine($"GetProductsBySearch: Query='{searchQuery}', Found {products.Count} products.");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetProductsBySearch Error: {ex.Message}");
+                throw;
+            }
+            return products;
+        }
+
+        public List<Product> GetProductsByCategory(int categoryId)
+        {
+            List<Product> products = new List<Product>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = @"
+                        SELECT ProductID, ProductName, Price, QuantitySold, Description, CategoryID, ImageURL
+                        FROM Products
+                        WHERE CategoryID = @CategoryID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@CategoryID", categoryId);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                products.Add(new Product
+                                {
+                                    ProductID = reader.GetInt32(0),
+                                    ProductName = reader.GetString(1),
+                                    Price = reader.GetDecimal(2),
+                                    QuantitySold = reader.GetInt32(3),
+                                    Description = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                    CategoryID = reader.GetInt32(5),
+                                    ImageURL = reader.IsDBNull(6) ? null : reader.GetString(6)
+                                });
+                            }
+                        }
+                    }
+                }
+                System.Diagnostics.Debug.WriteLine($"GetProductsByCategory: CategoryID={categoryId}, Found {products.Count} products.");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetProductsByCategory Error: {ex.Message}");
+                throw;
             }
             return products;
         }
