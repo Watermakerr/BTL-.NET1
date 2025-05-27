@@ -22,12 +22,14 @@ namespace ClothingStoreApp.Services
                         command.Parameters.AddWithValue("@Username", username);
                         command.Parameters.AddWithValue("@Password", password);
                         int count = (int)command.ExecuteScalar();
+                        System.Diagnostics.Debug.WriteLine($"AuthenticateUser: Username={username}, Success={count > 0}");
                         return count > 0;
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"AuthenticateUser Error: {ex.Message}");
                 return false;
             }
         }
@@ -44,12 +46,15 @@ namespace ClothingStoreApp.Services
                     {
                         command.Parameters.AddWithValue("@Username", username);
                         object result = command.ExecuteScalar();
-                        return result != null ? Convert.ToInt32(result) : (int?)null;
+                        int? userId = result != null ? Convert.ToInt32(result) : (int?)null;
+                        System.Diagnostics.Debug.WriteLine($"GetUserIdByUsername: Username={username}, UserID={userId}");
+                        return userId;
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"GetUserIdByUsername Error: {ex.Message}");
                 return null;
             }
         }
@@ -67,7 +72,10 @@ namespace ClothingStoreApp.Services
                         checkCommand.Parameters.AddWithValue("@Username", username);
                         int count = (int)checkCommand.ExecuteScalar();
                         if (count > 0)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"RegisterUser: Username={username} already exists");
                             return false;
+                        }
                     }
 
                     string insertQuery = "INSERT INTO Users (Username, Password, PhoneNumber) VALUES (@Username, @Password, @PhoneNumber)";
@@ -77,16 +85,17 @@ namespace ClothingStoreApp.Services
                         insertCommand.Parameters.AddWithValue("@Password", password);
                         insertCommand.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
                         insertCommand.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"RegisterUser: Username={username} registered successfully");
                         return true;
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"RegisterUser Error: {ex.Message}");
                 return false;
             }
         }
-
 
         public List<Product> GetTopSellingProducts()
         {
@@ -117,10 +126,11 @@ namespace ClothingStoreApp.Services
                         }
                     }
                 }
+                System.Diagnostics.Debug.WriteLine($"GetTopSellingProducts: Found {products.Count} products");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log lỗi nếu cần
+                System.Diagnostics.Debug.WriteLine($"GetTopSellingProducts Error: {ex.Message}");
             }
             return products;
         }
@@ -155,10 +165,11 @@ namespace ClothingStoreApp.Services
                         }
                     }
                 }
+                System.Diagnostics.Debug.WriteLine($"GetProductById: ProductID={productId}, Found={product != null}");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log lỗi nếu cần
+                System.Diagnostics.Debug.WriteLine($"GetProductById Error: {ex.Message}");
             }
             return product;
         }
@@ -192,10 +203,11 @@ namespace ClothingStoreApp.Services
                         }
                     }
                 }
+                System.Diagnostics.Debug.WriteLine($"GetReviewsByProductId: ProductID={productId}, Found {reviews.Count} reviews");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Log lỗi nếu cần
+                System.Diagnostics.Debug.WriteLine($"GetReviewsByProductId Error: {ex.Message}");
             }
             return reviews;
         }
@@ -217,8 +229,9 @@ namespace ClothingStoreApp.Services
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"IsProductInWishlist Error: {ex.Message}");
                 return false;
             }
         }
@@ -240,8 +253,9 @@ namespace ClothingStoreApp.Services
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"AddToWishlist Error: {ex.Message}");
                 return false;
             }
         }
@@ -263,11 +277,13 @@ namespace ClothingStoreApp.Services
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"RemoveFromWishlist Error: {ex.Message}");
                 return false;
             }
         }
+
         public List<Product> GetWishlistProducts(int userId)
         {
             List<Product> products = new List<Product>();
@@ -277,10 +293,10 @@ namespace ClothingStoreApp.Services
                 {
                     connection.Open();
                     string query = @"
-                SELECT p.ProductID, p.ProductName, p.Price, p.QuantitySold, p.Description, p.CategoryID, p.ImageURL
-                FROM Products p
-                INNER JOIN Wishlist w ON p.ProductID = w.ProductID
-                WHERE w.UserID = @UserID";
+                        SELECT p.ProductID, p.ProductName, p.Price, p.QuantitySold, p.Description, p.CategoryID, p.ImageURL
+                        FROM Products p
+                        INNER JOIN Wishlist w ON p.ProductID = w.ProductID
+                        WHERE w.UserID = @UserID";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@UserID", userId);
@@ -302,15 +318,15 @@ namespace ClothingStoreApp.Services
                         }
                     }
                 }
-                System.Diagnostics.Debug.WriteLine($"GetWishlistProducts: UserID={userId}, Found {products.Count} products.");
+                System.Diagnostics.Debug.WriteLine($"GetWishlistProducts: UserID={userId}, Found {products.Count} products");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"GetWishlistProducts Error: {ex.Message}");
-                throw; // Throw to catch errors during debugging
             }
             return products;
         }
+
         public List<Category> GetCategories()
         {
             List<Category> categories = new List<Category>();
@@ -336,7 +352,7 @@ namespace ClothingStoreApp.Services
                         }
                     }
                 }
-                System.Diagnostics.Debug.WriteLine($"GetCategories: Found {categories.Count} categories.");
+                System.Diagnostics.Debug.WriteLine($"GetCategories: Found {categories.Count} categories");
             }
             catch (Exception ex)
             {
@@ -378,12 +394,11 @@ namespace ClothingStoreApp.Services
                         }
                     }
                 }
-                System.Diagnostics.Debug.WriteLine($"GetProductsBySearch: Query='{searchQuery}', Found {products.Count} products.");
+                System.Diagnostics.Debug.WriteLine($"GetProductsBySearch: Query='{searchQuery}', Found {products.Count} products");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"GetProductsBySearch Error: {ex.Message}");
-                throw;
             }
             return products;
         }
@@ -421,14 +436,181 @@ namespace ClothingStoreApp.Services
                         }
                     }
                 }
-                System.Diagnostics.Debug.WriteLine($"GetProductsByCategory: CategoryID={categoryId}, Found {products.Count} products.");
+                System.Diagnostics.Debug.WriteLine($"GetProductsByCategory: CategoryID={categoryId}, Found {products.Count} products");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"GetProductsByCategory Error: {ex.Message}");
-                throw;
             }
             return products;
+        }
+
+        public bool IsProductInCart(int userId, int productId)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "SELECT COUNT(*) FROM Cart WHERE UserID = @UserID AND ProductID = @ProductID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        command.Parameters.AddWithValue("@ProductID", productId);
+                        int count = (int)command.ExecuteScalar();
+                        System.Diagnostics.Debug.WriteLine($"IsProductInCart: UserID={userId}, ProductID={productId}, InCart={count > 0}");
+                        return count > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"IsProductInCart Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool AddToCart(int userId, int productId, int quantity)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = @"
+                        IF EXISTS (SELECT 1 FROM Cart WHERE UserID = @UserID AND ProductID = @ProductID)
+                            UPDATE Cart
+                            SET Quantity = Quantity + @Quantity, AddedDate = GETDATE()
+                            WHERE UserID = @UserID AND ProductID = @ProductID
+                        ELSE
+                            INSERT INTO Cart (UserID, ProductID, Quantity, AddedDate)
+                            VALUES (@UserID, @ProductID, @Quantity, GETDATE())";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        command.Parameters.AddWithValue("@ProductID", productId);
+                        command.Parameters.AddWithValue("@Quantity", quantity);
+                        command.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"AddToCart: UserID={userId}, ProductID={productId}, Quantity={quantity}, Success=true");
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"AddToCart Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool UpdateCartItem(int userId, int productId, int quantity)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = @"
+                        UPDATE Cart
+                        SET Quantity = @Quantity, AddedDate = GETDATE()
+                        WHERE UserID = @UserID AND ProductID = @ProductID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        command.Parameters.AddWithValue("@ProductID", productId);
+                        command.Parameters.AddWithValue("@Quantity", quantity);
+                        int rowsAffected = command.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"UpdateCartItem: UserID={userId}, ProductID={productId}, Quantity={quantity}, RowsAffected={rowsAffected}");
+                        return rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"UpdateCartItem Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool RemoveFromCart(int userId, int productId)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "DELETE FROM Cart WHERE UserID = @UserID AND ProductID = @ProductID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        command.Parameters.AddWithValue("@ProductID", productId);
+                        int rowsAffected = command.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"RemoveFromCart: UserID={userId}, ProductID={productId}, RowsAffected={rowsAffected}");
+                        return rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"RemoveFromCart Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        public List<(Cart Cart, Product Product)> GetCartItems(int userId)
+        {
+            List<(Cart Cart, Product Product)> cartItems = new List<(Cart, Product)>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = @"
+                        SELECT c.UserID, c.ProductID, c.Quantity, c.AddedDate, 
+                               p.ProductID, p.ProductName, p.Price, p.QuantitySold, p.Description, p.CategoryID, p.ImageURL
+                        FROM Cart c
+                        LEFT JOIN Products p ON c.ProductID = p.ProductID
+                        WHERE c.UserID = @UserID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var cart = new Cart
+                                {
+                                    UserID = reader.GetInt32(0),
+                                    ProductID = reader.GetInt32(1),
+                                    Quantity = reader.GetInt32(2),
+                                    AddedDate = reader.GetDateTime(3)
+                                };
+                                Product product = null;
+                                if (!reader.IsDBNull(4))
+                                {
+                                    product = new Product
+                                    {
+                                        ProductID = reader.GetInt32(4),
+                                        ProductName = reader.GetString(5),
+                                        Price = reader.GetDecimal(6),
+                                        QuantitySold = reader.GetInt32(7),
+                                        Description = reader.IsDBNull(8) ? null : reader.GetString(8),
+                                        CategoryID = reader.GetInt32(9),
+                                        ImageURL = reader.IsDBNull(10) ? null : reader.GetString(10)
+                                    };
+                                }
+                                cartItems.Add((cart, product));
+                            }
+                        }
+                    }
+                }
+                System.Diagnostics.Debug.WriteLine($"GetCartItems: UserID={userId}, Found {cartItems.Count} items, ProductsFound={cartItems.Count(i => i.Product != null)}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetCartItems Error: {ex.Message}");
+            }
+            return cartItems;
         }
     }
 }

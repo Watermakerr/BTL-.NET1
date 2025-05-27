@@ -21,7 +21,7 @@ public partial class App : Application
         services.AddTransient<HomeViewModel>();
         services.AddTransient<ProductDetailViewModel>();
         services.AddTransient<WishlistViewModel>();
-        //services.AddTransient<CartViewModel>();
+        services.AddTransient<CartViewModel>();
         services.AddTransient<ProductListViewModel>();
         Services = services.BuildServiceProvider();
 

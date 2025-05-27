@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ClothingStoreApp.ViewModels"
+             x:Class="ClothingStoreApp.Views.CartPage"
+             BackgroundColor="White"
+             x:Name="ThisPage">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="20" Padding="15">
+                <!-- Cart Items -->
+                <Label Text="Giỏ hàng" FontSize="24" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                <CollectionView ItemsSource="{Binding CartItems}" 
+                                EmptyView="Giỏ hàng trống" 
+                                Margin="0,10">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame CornerRadius="10" Padding="10" BackgroundColor="#F5F5F5" Margin="0,5">
+                                <Grid ColumnDefinitions="100,*,Auto,Auto" ColumnSpacing="10" RowDefinitions="Auto,Auto,Auto" RowSpacing="5">
+                                    <!-- Image -->
+                                    <Image Source="{Binding Product.ImageURL}" 
+                                           WidthRequest="80" 
+                                           HeightRequest="80" 
+                                           Grid.RowSpan="3" 
+                                           Grid.Column="0" />
+                                    <!-- Name -->
+                                    <Label Text="{Binding Product.ProductName}" 
+                                           FontSize="16" 
+                                           FontAttributes="Bold" 
+                                           LineBreakMode="WordWrap" 
+                                           Grid.Column="1" 
+                                           Grid.Row="0" />
+                                    <!-- Per-unit Price -->
+                                    <Label Text="{Binding Product.Price, StringFormat='Đơn giá: {0:C0}'}" 
+                                           FontSize="12" 
+                                           TextColor="Gray" 
+                                           Grid.Column="1" 
+                                           Grid.Row="1" />
+                                    <!-- Quantity Selector -->
+                                    <Grid ColumnDefinitions="Auto,50,Auto" ColumnSpacing="5" Grid.Column="1" Grid.Row="2">
+                                        <Button Text="-" 
+                                                FontSize="14" 
+                                                WidthRequest="30" 
+                                                HeightRequest="30" 
+                                                CornerRadius="15" 
+                                                BackgroundColor="#007BFF" 
+                                                TextColor="White" 
+                                                Grid.Column="0" 
+                                                Command="{Binding DecreaseQuantityCommand}" />
+                                        <Entry Text="{Binding Quantity, Mode=TwoWay}" 
+                                               Keyboard="Numeric" 
+                                               WidthRequest="50" 
+                                               HorizontalTextAlignment="Center" 
+                                               VerticalOptions="Center" 
+                                               Grid.Column="1" />
+                                        <Button Text="+" 
+                                                FontSize="14" 
+                                                WidthRequest="30" 
+                                                HeightRequest="30" 
+                                                CornerRadius="15" 
+                                                BackgroundColor="#007BFF" 
+                                                TextColor="White" 
+                                                Grid.Column="2" 
+                                                Command="{Binding IncreaseQuantityCommand}" />
+                                    </Grid>
+                                    <!-- Total Price -->
+                                    <Label Text="{Binding TotalPrice, StringFormat='Giá: {0:C0}'}" 
+                                           FontSize="14" 
+                                           TextColor="Red" 
+                                           VerticalOptions="Center" 
+                                           Grid.Column="2" 
+                                           Grid.RowSpan="3" />
+                                    <!-- Delete Button -->
+                                    <Button Text="x" 
+                                            FontSize="14" 
+                                            WidthRequest="30" 
+                                            HeightRequest="30" 
+                                            CornerRadius="15" 
+                                            BackgroundColor="#FF3333" 
+                                            TextColor="White" 
+                                            Grid.Column="3" 
+                                            Grid.RowSpan="3" 
+                                            VerticalOptions="Center" 
+                                            Command="{Binding DeleteCommand}" />
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Total Price -->
+                <Frame CornerRadius="10" Padding="10" BackgroundColor="#F5F5F5">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Label Text="Tổng cộng:" 
+                               FontSize="18" 
+                               FontAttributes="Bold" 
+                               VerticalOptions="Center" 
+                               Grid.Column="0" />
+                        <Label Text="{Binding TotalCartPrice, StringFormat='{0:C0}'}" 
+                               FontSize="18" 
+                               TextColor="Red" 
+                               VerticalOptions="Center" 
+                               Grid.Column="1" />
+                    </Grid>
+                </Frame>
+
+                <!-- Order Button -->
+                <Button Text="Đặt hàng" 
+                        BackgroundColor="#007BFF" 
+                        TextColor="White" 
+                        CornerRadius="10" 
+                        Padding="10" 
+                        HorizontalOptions="Fill" 
+                        Command="{Binding PlaceOrderCommand}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Tabbar -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" BackgroundColor="#F5F5F5" HeightRequest="60">
+            <Button Text="Home" 
+                    Grid.Column="0" 
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"
+                    Command="{Binding NavigateToHomeCommand}"
+                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+            <Button Text="Giỏ hàng" 
+                    Grid.Column="1" 
+                    BackgroundColor="Transparent" 
+                    TextColor="#007BFF" 
+                    FontAttributes="Bold" />
+            <Button Text="Yêu thích" 
+                    Grid.Column="2" 
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"
+                    Command="{Binding NavigateToWishlistCommand}"
+                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+            <Button Text="Trang cá nhân" 
+                    Grid.Column="3" 
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"
+                    Command="{Binding NavigateToRegisterCommand}"
+                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+        </Grid>
+    </Grid>
+</ContentPage>

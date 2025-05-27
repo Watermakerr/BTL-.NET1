@@ -23,6 +23,38 @@
                    TextColor="Red" 
                    HorizontalTextAlignment="Center" />
 
+            <!-- Quantity Selector (Custom) -->
+            <Grid ColumnDefinitions="Auto,50,Auto,Auto" ColumnSpacing="10" HorizontalOptions="Center">
+                <Label Text="Số lượng:" 
+                       FontSize="16" 
+                       VerticalOptions="Center" 
+                       Grid.Column="0" />
+                <Button Text="-" 
+                        FontSize="16" 
+                        WidthRequest="40" 
+                        HeightRequest="40" 
+                        CornerRadius="20" 
+                        BackgroundColor="#007BFF" 
+                        TextColor="White" 
+                        Grid.Column="1" 
+                        Command="{Binding DecreaseQuantityCommand}" />
+                <Entry Text="{Binding Quantity, Mode=TwoWay}" 
+                       Keyboard="Numeric" 
+                       WidthRequest="50" 
+                       HorizontalTextAlignment="Center" 
+                       VerticalOptions="Center" 
+                       Grid.Column="2" />
+                <Button Text="+" 
+                        FontSize="16" 
+                        WidthRequest="40" 
+                        HeightRequest="40" 
+                        CornerRadius="20" 
+                        BackgroundColor="#007BFF" 
+                        TextColor="White" 
+                        Grid.Column="3" 
+                        Command="{Binding IncreaseQuantityCommand}" />
+            </Grid>
+
             <!-- Product Details -->
             <Frame CornerRadius="10" Padding="10" BackgroundColor="#F5F5F5">
                 <VerticalStackLayout Spacing="10">
@@ -38,7 +70,9 @@
                         BackgroundColor="#007BFF" 
                         TextColor="White" 
                         CornerRadius="10" 
-                        Padding="10" />
+                        Padding="10"
+                        Command="{Binding AddToCartCommand}"
+                        CommandParameter="{Binding Source={x:Reference ThisPage}}" />
                 <Button Grid.Column="1" 
                         Text="{Binding HeartIcon}" 
                         FontSize="24" 
