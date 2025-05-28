@@ -25,6 +25,7 @@ public partial class App : Application
         services.AddTransient<ProductListViewModel>();
         services.AddTransient<ProfileViewModel>();
         services.AddTransient<ChangePasswordViewModel>();
+        services.AddTransient<OrderDetailViewModel>();
         Services = services.BuildServiceProvider();
 
         MainPage = new NavigationPage(new LoginPage());

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:ClothingStoreApp.ViewModels"
              x:Class="ClothingStoreApp.Views.ProfilePage"
              x:Name="ThisPage">
 
     <Grid RowDefinitions="*, Auto">
-
         <ScrollView Grid.Row="0">
             <VerticalStackLayout Spacing="5" Padding="10" VerticalOptions="Start">
                 <Button Text="Xem thông tin cá nhân"
@@ -19,20 +19,63 @@
                         TextColor="White"
                         CornerRadius="10"
                         HeightRequest="50"
-                        Command="{Binding ChangepasswordCommand}" />        
+                        Command="{Binding ChangepasswordCommand}" />
+
+                <!-- Button to toggle Order List visibility -->
                 <Button Text="Xem lịch sử đơn hàng"
                         BackgroundColor="#28A745"
                         TextColor="White"
                         CornerRadius="10"
                         HeightRequest="50"
-                        Command="{Binding ViewOrdersCommand}" />
+                        Command="{Binding ToggleOrderListCommand}" />
+
+                <!-- Order List with visibility binding -->
+                <VerticalStackLayout IsVisible="{Binding IsOrderListVisible}" Spacing="5">
+                    <Label Text="Lịch sử đơn hàng" FontSize="Large" FontAttributes="Bold" Margin="0,10,0,5" />
+                    <CollectionView ItemsSource="{Binding Orders}" HeightRequest="300">
+                        <CollectionView.EmptyView>
+                            <Label Text="Bạn chưa có đơn hàng nào." 
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center"
+                                   FontSize="Medium"
+                                   TextColor="Gray" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame BackgroundColor="#F5F5F5" CornerRadius="10" Padding="10" Margin="0,5">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="5">
+                                            <Label Text="{Binding OrderID, StringFormat='Đơn hàng #{0}'}" 
+                                                   FontSize="Medium" FontAttributes="Bold" />
+                                            <Label Text="{Binding OrderDate, StringFormat='Ngày đặt: {0:dd/MM/yyyy HH:mm}'}"
+                                                   FontSize="Small" />
+                                            <Label Text="{Binding TotalAmount, StringFormat='Tổng tiền: {0:C0}'}"
+                                                   FontSize="Small" />
+                                            <Label Text="{Binding Address, StringFormat='Địa chỉ: {0}'}"
+                                                   FontSize="Small" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="1" 
+                                               Text="Xem chi tiết" 
+                                               TextColor="#007BFF" 
+                                               FontAttributes="Bold" 
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.ViewOrderDetailsCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Frame.GestureRecognizers>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
                 <Button Text="Đăng xuất"
                         BackgroundColor="#DC3545"
                         TextColor="White"
                         CornerRadius="10"
                         HeightRequest="50"
                         Command="{Binding LogoutCommand}" />
-                <!-- Bạn có thể thêm nhiều nút hơn ở đây -->
             </VerticalStackLayout>
         </ScrollView>
 

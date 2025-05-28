@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClothingStoreApp.Views.OrderDetailPage"
+             Title="Chi Tiết Đơn Hàng">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="15" Padding="20">
+            <!-- Order Summary -->
+            <Frame BackgroundColor="#F5F5F5" CornerRadius="10" Padding="10">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="{Binding Order.OrderID, StringFormat='Đơn hàng #{0}'}" FontSize="Large" FontAttributes="Bold" />
+                    <Label Text="{Binding Order.OrderDate, StringFormat='Ngày đặt: {0:dd/MM/yyyy HH:mm}'}" FontSize="Medium" />
+                    <Label Text="{Binding Order.TotalAmount, StringFormat='Tổng tiền: {0:C0}'}" FontSize="Medium" />
+                    <Label Text="{Binding Order.Address, StringFormat='Địa chỉ: {0}'}" FontSize="Medium" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Order Items -->
+            <Label Text="Sản phẩm trong đơn hàng" FontSize="Large" FontAttributes="Bold" Margin="0,10,0,5" />
+            <CollectionView ItemsSource="{Binding OrderItems}" HeightRequest="300">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BackgroundColor="#FFFFFF" CornerRadius="10" Padding="10" Margin="0,5">
+                            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                                <!-- Product Image (Placeholder) -->
+                                <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
+                                       Source="{Binding Product.ImageURL}"
+                                       WidthRequest="50" HeightRequest="50"
+                                       Aspect="AspectFill" />
+
+                                <!-- Product Name and Description -->
+                                <Label Grid.Column="1" Grid.Row="0"
+                                       Text="{Binding Product.ProductName}"
+                                       FontSize="Medium" FontAttributes="Bold"
+                                       VerticalOptions="Center" Margin="10,0,0,0" />
+                                <Label Grid.Column="1" Grid.Row="1"
+                                       Text="{Binding Product.Description}"
+                                       FontSize="Small" TextColor="Gray"
+                                       VerticalOptions="Start" Margin="10,0,0,0" />
+
+                                <!-- Quantity and Price -->
+                                <Label Grid.Column="2" Grid.Row="0"
+                                       Text="{Binding Cart.Quantity, StringFormat='Số lượng: {0}'}"
+                                       FontSize="Small" VerticalOptions="Center" />
+                                <Label Grid.Column="2" Grid.Row="1"
+                                       Text="{Binding Product.Price, StringFormat='Giá: {0:C0}'}"
+                                       FontSize="Small" VerticalOptions="Start" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

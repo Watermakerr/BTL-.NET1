@@ -840,5 +840,61 @@ namespace ClothingStoreApp.Services
                 return false;
             }
         }
+
+        public List<(Cart Cart, Product Product)> GetOrderItems(int orderId)
+        {
+            List<(Cart Cart, Product Product)> orderItems = new List<(Cart, Product)>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = @"
+                        SELECT od.OrderID, od.ProductID, od.Quantity, od.UnitPrice,
+                               p.ProductID, p.ProductName, p.Price, p.QuantitySold, p.Description, p.CategoryID, p.ImageURL
+                        FROM OrderDetails od
+                        LEFT JOIN Products p ON od.ProductID = p.ProductID
+                        WHERE od.OrderID = @OrderID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@OrderID", orderId);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var cart = new Cart
+                                {
+                                    UserID = 0, // Not needed for order details
+                                    ProductID = reader.GetInt32(1),
+                                    Quantity = reader.GetInt32(2),
+                                    AddedDate = DateTime.Now // Placeholder, not stored in OrderDetails
+                                };
+                                Product product = null;
+                                if (!reader.IsDBNull(4))
+                                {
+                                    product = new Product
+                                    {
+                                        ProductID = reader.GetInt32(4),
+                                        ProductName = reader.GetString(5),
+                                        Price = reader.GetDecimal(6),
+                                        QuantitySold = reader.GetInt32(7),
+                                        Description = reader.IsDBNull(8) ? null : reader.GetString(8),
+                                        CategoryID = reader.GetInt32(9),
+                                        ImageURL = reader.IsDBNull(10) ? null : reader.GetString(10)
+                                    };
+                                }
+                                orderItems.Add((cart, product));
+                            }
+                        }
+                    }
+                }
+                System.Diagnostics.Debug.WriteLine($"GetOrderItems: OrderID={orderId}, Found {orderItems.Count} items");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetOrderItems Error: {ex.Message}");
+            }
+            return orderItems;
+        }
     }
 }

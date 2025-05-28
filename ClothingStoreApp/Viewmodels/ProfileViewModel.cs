@@ -17,10 +17,14 @@ namespace ClothingStoreApp.ViewModels
         [ObservableProperty]
         private ObservableCollection<Order> _orders;
 
+        [ObservableProperty]
+        private bool _isOrderListVisible;
+
         public ProfileViewModel(SqlService sqlService)
         {
             _sqlService = sqlService;
             Orders = new ObservableCollection<Order>();
+            IsOrderListVisible = false; // Hidden by default
             LoadUserData();
         }
 
@@ -42,14 +46,6 @@ namespace ClothingStoreApp.ViewModels
                     return;
                 }
                 System.Diagnostics.Debug.WriteLine($"LoadUserData: Loaded user {CurrentUser.Username}");
-
-                var orders = _sqlService.GetUserOrders(App.CurrentUserId.Value);
-                Orders.Clear(); // Clear trước khi add mới
-                foreach (var order in orders)
-                {
-                    Orders.Add(order);
-                }
-                System.Diagnostics.Debug.WriteLine($"LoadUserData: Loaded {Orders.Count} orders for UserID={App.CurrentUserId.Value}");
             }
             catch (Exception ex)
             {
@@ -57,23 +53,56 @@ namespace ClothingStoreApp.ViewModels
             }
         }
 
+        private void LoadOrders()
+        {
+            if (!App.CurrentUserId.HasValue)
+            {
+                System.Diagnostics.Debug.WriteLine("LoadOrders: No user logged in");
+                return;
+            }
+
+            try
+            {
+                var orders = _sqlService.GetUserOrders(App.CurrentUserId.Value);
+                Orders.Clear();
+                foreach (var order in orders)
+                {
+                    Orders.Add(order);
+                }
+                System.Diagnostics.Debug.WriteLine($"LoadOrders: Loaded {Orders.Count} orders for UserID={App.CurrentUserId.Value}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"LoadOrders Error: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private void ToggleOrderList(object parameter = null)
+        {
+            System.Diagnostics.Debug.WriteLine($"ToggleOrderList: Parameter={(parameter != null ? parameter.ToString() : "null")}");
+            if (!IsOrderListVisible)
+            {
+                LoadOrders(); // Load orders when showing the list
+            }
+            IsOrderListVisible = !IsOrderListVisible;
+            System.Diagnostics.Debug.WriteLine($"ToggleOrderList: IsOrderListVisible={IsOrderListVisible}");
+        }
+
         [RelayCommand]
         private async Task ViewUserInfo()
         {
-            // Kiểm tra user đăng nhập trước
             if (!App.CurrentUserId.HasValue)
             {
                 await Application.Current.MainPage.DisplayAlert("Lỗi", "Bạn chưa đăng nhập.", "OK");
                 return;
             }
 
-            // Thử reload dữ liệu nếu CurrentUser null
             if (CurrentUser == null)
             {
                 System.Diagnostics.Debug.WriteLine("ViewUserInfo: CurrentUser is null, trying to reload...");
                 LoadUserData();
 
-                // Nếu vẫn null sau khi reload
                 if (CurrentUser == null)
                 {
                     await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể tải thông tin người dùng.", "OK");
@@ -89,39 +118,25 @@ namespace ClothingStoreApp.ViewModels
         }
 
         [RelayCommand]
-        private async Task ViewOrders()
+        private async Task ViewOrderDetails(Order order)
         {
-            // Kiểm tra user đăng nhập trước
-            if (!App.CurrentUserId.HasValue)
+            if (order == null)
             {
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Bạn chưa đăng nhập.", "OK");
+                System.Diagnostics.Debug.WriteLine("ViewOrderDetails: Order is null");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể xem chi tiết đơn hàng.", "OK");
                 return;
             }
 
-            // Thử reload dữ liệu nếu Orders rỗng
-            if (Orders.Count == 0)
+            try
             {
-                System.Diagnostics.Debug.WriteLine("ViewOrders: Orders is empty, trying to reload...");
-                LoadUserData();
+                System.Diagnostics.Debug.WriteLine($"ViewOrderDetails: Navigating to OrderDetailPage for OrderID={order.OrderID}");
+                await Application.Current.MainPage.Navigation.PushAsync(new OrderDetailPage(order));
             }
-
-            // Kiểm tra lại sau khi reload
-            if (Orders.Count == 0)
+            catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Thông báo", "Bạn chưa có đơn hàng nào.", "OK");
-                return;
+                System.Diagnostics.Debug.WriteLine($"ViewOrderDetails Error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
             }
-
-            string orderSummary = "";
-            foreach (var order in Orders)
-            {
-                orderSummary += $"Đơn hàng #{order.OrderID}\n" +
-                                $"Ngày đặt: {order.OrderDate:dd/MM/yyyy HH:mm}\n" +
-                                $"Tổng tiền: {order.TotalAmount:C0}\n" +
-                                $"Địa chỉ: {order.Address}\n\n";
-            }
-            await Application.Current.MainPage.DisplayAlert("Lịch sử đơn hàng", orderSummary, "OK");
-            System.Diagnostics.Debug.WriteLine("ViewOrders: Displayed order history");
         }
 
         [RelayCommand]
@@ -134,7 +149,6 @@ namespace ClothingStoreApp.ViewModels
             System.Diagnostics.Debug.WriteLine("Logout: User logged out");
         }
 
-        // Thêm method để refresh dữ liệu (giống WishlistViewModel)
         [RelayCommand]
         private void RefreshProfile()
         {
@@ -161,6 +175,7 @@ namespace ClothingStoreApp.ViewModels
                 await Application.Current.MainPage.DisplayAlert("Error", "Cannot navigate to home", "OK");
             }
         }
+
         [RelayCommand]
         private async Task NavigateToCart(object parameter)
         {
@@ -202,7 +217,5 @@ namespace ClothingStoreApp.ViewModels
                 await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
             }
         }
-
-
     }
 }
