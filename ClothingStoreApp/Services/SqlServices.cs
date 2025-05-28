@@ -59,6 +59,31 @@ namespace ClothingStoreApp.Services
             }
         }
 
+        public string GetUserAddress(int userId)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "SELECT Address FROM Users WHERE UserID = @UserID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        object result = command.ExecuteScalar();
+                        string address = result != null ? result.ToString() : "Chưa có địa chỉ giao hàng";
+                        System.Diagnostics.Debug.WriteLine($"GetUserAddress: UserID={userId}, Address={address}");
+                        return address;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetUserAddress Error: {ex.Message}");
+                return "Lỗi khi lấy địa chỉ";
+            }
+        }
+
         public bool RegisterUser(string username, string password, string phoneNumber)
         {
             try
@@ -225,6 +250,7 @@ namespace ClothingStoreApp.Services
                         command.Parameters.AddWithValue("@UserID", userId);
                         command.Parameters.AddWithValue("@ProductID", productId);
                         int count = (int)command.ExecuteScalar();
+                        System.Diagnostics.Debug.WriteLine($"IsProductInWishlist: UserID={userId}, ProductID={productId}, InWishlist={count > 0}");
                         return count > 0;
                     }
                 }
@@ -249,6 +275,7 @@ namespace ClothingStoreApp.Services
                         command.Parameters.AddWithValue("@UserID", userId);
                         command.Parameters.AddWithValue("@ProductID", productId);
                         command.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"AddToWishlist: UserID={userId}, ProductID={productId}, Success=true");
                         return true;
                     }
                 }
@@ -273,6 +300,7 @@ namespace ClothingStoreApp.Services
                         command.Parameters.AddWithValue("@UserID", userId);
                         command.Parameters.AddWithValue("@ProductID", productId);
                         command.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"RemoveFromWishlist: UserID={userId}, ProductID={productId}, Success=true");
                         return true;
                     }
                 }
@@ -611,6 +639,206 @@ namespace ClothingStoreApp.Services
                 System.Diagnostics.Debug.WriteLine($"GetCartItems Error: {ex.Message}");
             }
             return cartItems;
+        }
+
+        public int PlaceOrder(int userId, decimal totalAmount, string address)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "INSERT INTO Orders (UserID, OrderDate, TotalAmount, Address) VALUES (@UserID, GETDATE(), @TotalAmount, @Address); SELECT SCOPE_IDENTITY();";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        command.Parameters.AddWithValue("@TotalAmount", totalAmount);
+                        command.Parameters.AddWithValue("@Address", address);
+                        int orderId = Convert.ToInt32(command.ExecuteScalar());
+                        System.Diagnostics.Debug.WriteLine($"PlaceOrder: UserID={userId}, OrderID={orderId}, TotalAmount={totalAmount}, Address={address}");
+                        return orderId;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"PlaceOrder Error: {ex.Message}");
+                return -1;
+            }
+        }
+
+        public bool AddOrderDetail(int orderId, int productId, int quantity, decimal unitPrice)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "INSERT INTO OrderDetails (OrderID, ProductID, Quantity, UnitPrice) VALUES (@OrderID, @ProductID, @Quantity, @UnitPrice)";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@OrderID", orderId);
+                        command.Parameters.AddWithValue("@ProductID", productId);
+                        command.Parameters.AddWithValue("@Quantity", quantity);
+                        command.Parameters.AddWithValue("@UnitPrice", unitPrice);
+                        command.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"AddOrderDetail: OrderID={orderId}, ProductID={productId}, Quantity={quantity}, UnitPrice={unitPrice}");
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"AddOrderDetail Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool ClearCart(int userId)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "DELETE FROM Cart WHERE UserID = @UserID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        int rowsAffected = command.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"ClearCart: UserID={userId}, RowsAffected={rowsAffected}");
+                        return rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"ClearCart Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        public User GetUserInfo(int userId)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "SELECT UserID, Username, PhoneNumber, Address FROM Users WHERE UserID = @UserID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return new User
+                                {
+                                    UserID = reader.GetInt32(0),
+                                    Username = reader.GetString(1),
+                                    PhoneNumber = reader.IsDBNull(2) ? null : reader.GetString(2),
+                                    Address = reader.IsDBNull(3) ? null : reader.GetString(3)
+                                };
+                            }
+                        }
+                    }
+                }
+                System.Diagnostics.Debug.WriteLine($"GetUserInfo: UserID={userId}, Not found");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetUserInfo Error: {ex.Message}");
+                return null;
+            }
+        }
+
+        public List<Order> GetUserOrders(int userId)
+        {
+            List<Order> orders = new List<Order>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "SELECT OrderID, UserID, OrderDate, TotalAmount, Address FROM Orders WHERE UserID = @UserID ORDER BY OrderDate DESC";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                orders.Add(new Order
+                                {
+                                    OrderID = reader.GetInt32(0),
+                                    UserID = reader.GetInt32(1),
+                                    OrderDate = reader.GetDateTime(2),
+                                    TotalAmount = reader.GetDecimal(3),
+                                    Address = reader.GetString(4)
+                                });
+                            }
+                        }
+                    }
+                }
+                System.Diagnostics.Debug.WriteLine($"GetUserOrders: UserID={userId}, Found {orders.Count} orders");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetUserOrders Error: {ex.Message}");
+            }
+            return orders;
+        }
+
+        public string GetUsernameByUserId(int userId)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "SELECT Username FROM Users WHERE UserID = @UserID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        object result = command.ExecuteScalar();
+                        string username = result?.ToString();
+                        System.Diagnostics.Debug.WriteLine($"GetUsernameByUserId: UserID={userId}, Username={username}");
+                        return username;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetUsernameByUserId Error: {ex.Message}");
+                return null;
+            }
+        }
+
+        public bool UpdateUserPassword(int userId, string newPassword)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "UPDATE Users SET Password = @Password WHERE UserID = @UserID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Password", newPassword);
+                        command.Parameters.AddWithValue("@UserID", userId);
+                        int rowsAffected = command.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"UpdateUserPassword: UserID={userId}, RowsAffected={rowsAffected}");
+                        return rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"UpdateUserPassword Error: {ex.Message}");
+                return false;
+            }
         }
     }
 }

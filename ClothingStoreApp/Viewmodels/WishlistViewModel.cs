@@ -96,6 +96,43 @@ namespace ClothingStoreApp.ViewModels
                 await Application.Current.MainPage.DisplayAlert("Error", "Cannot navigate to home", "OK");
             }
         }
+        [RelayCommand]
+        private async Task NavigateToCart(object parameter)
+        {
+            if (parameter is not ContentPage)
+            {
+                System.Diagnostics.Debug.WriteLine("NavigateToCart: Parameter is not ContentPage");
+                return;
+            }
+
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("NavigateToCart: Navigating to CartPage");
+                await Application.Current.MainPage.Navigation.PushAsync(new CartPage());
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"NavigateToCart Error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task NavigateToProfile(object parameter)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("NavigateToProfile: Navigating to ProfilePage");
+                await Application.Current.MainPage.Navigation.PushAsync(new ProfilePage());
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"NavigateToProfile Error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
+            }
+        }
+
+
 
         [RelayCommand]
         private void RefreshWishlist()

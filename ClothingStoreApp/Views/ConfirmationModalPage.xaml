@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClothingStoreApp.Views.ConfirmationModalPage"
+             Title="Xác nhận đặt hàng"
+             BackgroundColor="White">
+    <VerticalStackLayout Spacing="20" Padding="20" VerticalOptions="Center">
+        <Label Text="Xác nhận đặt hàng" 
+               FontSize="20" 
+               FontAttributes="Bold" 
+               HorizontalTextAlignment="Center" />
+        <Label Text="Địa chỉ giao hàng:" 
+               FontSize="16" 
+               FontAttributes="Bold" />
+        <Entry x:Name="AddressEntry" 
+               Placeholder="Nhập địa chỉ giao hàng" 
+               FontSize="14" 
+               HeightRequest="40" />
+        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+            <Button Text="Hủy" 
+                    BackgroundColor="#FF3333" 
+                    TextColor="White" 
+                    CornerRadius="10" 
+                    WidthRequest="120" 
+                    Clicked="OnCancelClicked" />
+            <Button Text="Xác nhận đặt hàng" 
+                    BackgroundColor="#007BFF" 
+                    TextColor="White" 
+                    CornerRadius="10" 
+                    WidthRequest="160" 
+                    Clicked="OnConfirmClicked" />
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>

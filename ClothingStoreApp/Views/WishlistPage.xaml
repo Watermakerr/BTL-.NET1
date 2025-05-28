@@ -88,16 +88,20 @@
             <Button Text="Giỏ hàng" 
                     Grid.Column="1" 
                     BackgroundColor="Transparent" 
-                    TextColor="Black" />
+                    TextColor="Black"
+                    Command="{Binding NavigateToCartCommand}"
+                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
             <Button Text="Yêu thích" 
                     Grid.Column="2" 
                     BackgroundColor="Transparent" 
                     TextColor="#007BFF" 
-                    FontAttributes="Bold" />
+                    FontAttributes="Bold"/>
             <Button Text="Trang cá nhân" 
                     Grid.Column="3" 
                     BackgroundColor="Transparent" 
-                    TextColor="Black"/>
+                    TextColor="Black" 
+                    Command="{Binding NavigateToProfileCommand}"
+                    CommandParameter="{Binding Source={x:Reference ThisPage}}"/>
         </Grid>
     </Grid>
 </ContentPage>

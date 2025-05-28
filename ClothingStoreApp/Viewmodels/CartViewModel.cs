@@ -1,10 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using ClothingStoreApp.Models;
 using ClothingStoreApp.Services;
 using ClothingStoreApp.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace ClothingStoreApp.ViewModels
 {
@@ -107,8 +107,53 @@ namespace ClothingStoreApp.ViewModels
                 return;
             }
 
-            System.Diagnostics.Debug.WriteLine("PlaceOrder: Order placement triggered");
-            await Application.Current.MainPage.DisplayAlert("Thông báo", "Chức năng đặt hàng đang được phát triển.", "OK");
+            try
+            {
+                await Application.Current.MainPage.Navigation.PushModalAsync(new ConfirmationModalPage(this));
+                System.Diagnostics.Debug.WriteLine("PlaceOrder: Showing confirmation modal page");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"PlaceOrder Error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể hiển thị xác nhận đơn hàng.", "OK");
+            }
+        }
+
+        public async Task ConfirmOrderAsync(string address)
+        {
+            if (!App.CurrentUserId.HasValue || string.IsNullOrWhiteSpace(address))
+            {
+                System.Diagnostics.Debug.WriteLine("ConfirmOrderAsync: Invalid user or address");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", "Thông tin không hợp lệ.", "OK");
+                return;
+            }
+
+            try
+            {
+                int orderId = _sqlService.PlaceOrder(App.CurrentUserId.Value, TotalCartPrice, address);
+                if (orderId > 0)
+                {
+                    foreach (var item in CartItems)
+                    {
+                        _sqlService.AddOrderDetail(orderId, item.Product.ProductID, item.Quantity, item.Product.Price);
+                    }
+                    _sqlService.ClearCart(App.CurrentUserId.Value);
+                    CartItems.Clear();
+                    UpdateTotalPrice();
+                    await Application.Current.MainPage.DisplayAlert("Thông báo", "Đơn hàng đã được đặt thành công!", "OK");
+                    System.Diagnostics.Debug.WriteLine($"ConfirmOrderAsync: Order placed, OrderID={orderId}, TotalAmount={TotalCartPrice}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("ConfirmOrderAsync: Failed to place order");
+                    await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể đặt hàng.", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"ConfirmOrderAsync Error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", "Có lỗi xảy ra khi đặt hàng.", "OK");
+            }
         }
 
         [RelayCommand]
@@ -127,6 +172,21 @@ namespace ClothingStoreApp.ViewModels
         }
 
         [RelayCommand]
+        private async Task NavigateToProfile(object parameter)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("NavigateToProfile: Navigating to ProfilePage");
+                await Application.Current.MainPage.Navigation.PushAsync(new ProfilePage());
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"NavigateToProfile Error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
         private async Task NavigateToWishlist()
         {
             try
@@ -137,21 +197,6 @@ namespace ClothingStoreApp.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"NavigateToWishlist Error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
-            }
-        }
-
-        [RelayCommand]
-        private async Task NavigateToRegister()
-        {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("NavigateToRegister: Navigating to RegisterPage");
-                await Application.Current.MainPage.Navigation.PushAsync(new RegisterPage());
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToRegister Error: {ex.Message}");
                 await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
             }
         }

@@ -102,27 +102,6 @@ namespace ClothingStoreApp.ViewModels
         }
 
         [RelayCommand]
-        private async Task NavigateToRegister(object parameter)
-        {
-            if (parameter is not ContentPage page)
-            {
-                System.Diagnostics.Debug.WriteLine("NavigateToRegister: Parameter is not ContentPage");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Lỗi điều hướng.", "OK");
-                return;
-            }
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("NavigateToRegister: Navigating to RegisterPage");
-                await page.Navigation.PushAsync(new RegisterPage());
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToRegister Error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
-            }
-        }
-
-        [RelayCommand]
         private async Task Search(object parameter)
         {
             if (string.IsNullOrWhiteSpace(SearchQuery))
@@ -188,6 +167,20 @@ namespace ClothingStoreApp.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"NavigateToCart Error: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
+            }
+        }
+        [RelayCommand]
+        private async Task NavigateToProfile(object parameter)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("NavigateToProfile: Navigating to ProfilePage");
+                await Application.Current.MainPage.Navigation.PushAsync(new ProfilePage());
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"NavigateToProfile Error: {ex.Message}");
                 await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
             }
         }

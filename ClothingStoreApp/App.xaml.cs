@@ -23,6 +23,8 @@ public partial class App : Application
         services.AddTransient<WishlistViewModel>();
         services.AddTransient<CartViewModel>();
         services.AddTransient<ProductListViewModel>();
+        services.AddTransient<ProfileViewModel>();
+        services.AddTransient<ChangePasswordViewModel>();
         Services = services.BuildServiceProvider();
 
         MainPage = new NavigationPage(new LoginPage());

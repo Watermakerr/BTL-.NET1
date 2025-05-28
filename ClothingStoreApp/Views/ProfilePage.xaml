@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClothingStoreApp.Views.ProfilePage"
+             x:Name="ThisPage">
+
+    <Grid RowDefinitions="*, Auto">
+
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="5" Padding="10" VerticalOptions="Start">
+                <Button Text="Xem thông tin cá nhân"
+                        BackgroundColor="#007BFF"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        Command="{Binding ViewUserInfoCommand}" />
+                <Button Text="Đổi mật khẩu"
+                        BackgroundColor="#FD7E14"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        Command="{Binding ChangepasswordCommand}" />        
+                <Button Text="Xem lịch sử đơn hàng"
+                        BackgroundColor="#28A745"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        Command="{Binding ViewOrdersCommand}" />
+                <Button Text="Đăng xuất"
+                        BackgroundColor="#DC3545"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        Command="{Binding LogoutCommand}" />
+                <!-- Bạn có thể thêm nhiều nút hơn ở đây -->
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Tab bar cố định ở dưới -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" BackgroundColor="#F5F5F5" HeightRequest="60">
+            <Button Text="Home" 
+                    Grid.Column="0" 
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"
+                    Command="{Binding NavigateToHomeCommand}"
+                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+            <Button Text="Giỏ hàng" 
+                    Grid.Column="1" 
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"
+                    Command="{Binding NavigateToCartCommand}"
+                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+            <Button Text="Yêu thích" 
+                    Grid.Column="2" 
+                    BackgroundColor="Transparent" 
+                    TextColor="Black"
+                    Command="{Binding NavigateToWishlistCommand}"
+                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+            <Button Text="Trang cá nhân" 
+                    Grid.Column="3" 
+                    BackgroundColor="Transparent" 
+                    TextColor="#007BFF" 
+                    FontAttributes="Bold"/>
+        </Grid>
+    </Grid>
+</ContentPage>
