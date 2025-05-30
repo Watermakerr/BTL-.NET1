@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using ClothingStoreApp.Services;
-
+using System.Globalization;
 namespace ClothingStoreApp;
 
 public static class MauiProgram
@@ -8,6 +8,9 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
+        var culture = new CultureInfo("vi-VN");
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
         builder
             .UseMauiApp<App>()
             .ConfigureFonts(fonts =>

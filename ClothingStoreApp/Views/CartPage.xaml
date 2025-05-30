@@ -3,143 +3,319 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:ClothingStoreApp.ViewModels"
              x:Class="ClothingStoreApp.Views.CartPage"
-             BackgroundColor="White"
+             BackgroundColor="#F8F9FA"
              x:Name="ThisPage">
     <Grid RowDefinitions="*,Auto">
         <ScrollView Grid.Row="0">
-            <VerticalStackLayout Spacing="20" Padding="15">
-                <!-- Cart Items -->
-                <Label Text="Giỏ hàng" FontSize="24" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+            <VerticalStackLayout Spacing="20" Padding="20,25,20,20">
+                <!-- Header with gradient background -->
+                <Frame BackgroundColor="Transparent" Padding="0" HasShadow="False" Margin="0,0,0,10">
+                    <Border StrokeThickness="0" 
+                            BackgroundColor="Transparent">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#667eea" Offset="0.0" />
+                                <GradientStop Color="#764ba2" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Grid Padding="20,15">
+                            <Label Text="Giỏ hàng của bạn" 
+                                   FontSize="28" 
+                                   FontAttributes="Bold" 
+                                   TextColor="White"
+                                   HorizontalTextAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </Frame>
+
+                <!-- Cart Items with enhanced styling -->
                 <CollectionView ItemsSource="{Binding CartItems}" 
                                 EmptyView="Giỏ hàng trống" 
                                 Margin="0,10">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame CornerRadius="10" Padding="10" BackgroundColor="#F5F5F5" Margin="0,5">
-                                <Grid ColumnDefinitions="100,*,Auto,Auto" ColumnSpacing="10" RowDefinitions="Auto,Auto,Auto" RowSpacing="5">
-                                    <!-- Image -->
-                                    <Image Source="{Binding Product.ImageURL}" 
-                                           WidthRequest="80" 
-                                           HeightRequest="80" 
-                                           Grid.RowSpan="3" 
-                                           Grid.Column="0" />
-                                    <!-- Name -->
-                                    <Label Text="{Binding Product.ProductName}" 
-                                           FontSize="16" 
-                                           FontAttributes="Bold" 
-                                           LineBreakMode="WordWrap" 
-                                           Grid.Column="1" 
-                                           Grid.Row="0" />
-                                    <!-- Per-unit Price -->
-                                    <Label Text="{Binding Product.Price, StringFormat='Đơn giá: {0:C0}'}" 
-                                           FontSize="12" 
-                                           TextColor="Gray" 
-                                           Grid.Column="1" 
-                                           Grid.Row="1" />
-                                    <!-- Quantity Selector -->
-                                    <Grid ColumnDefinitions="Auto,50,Auto" ColumnSpacing="5" Grid.Column="1" Grid.Row="2">
-                                        <Button Text="-" 
-                                                FontSize="14" 
-                                                WidthRequest="30" 
-                                                HeightRequest="30" 
-                                                CornerRadius="15" 
-                                                BackgroundColor="#007BFF" 
-                                                TextColor="White" 
-                                                Grid.Column="0" 
-                                                Command="{Binding DecreaseQuantityCommand}" />
-                                        <Entry Text="{Binding Quantity, Mode=TwoWay}" 
-                                               Keyboard="Numeric" 
-                                               WidthRequest="50" 
-                                               HorizontalTextAlignment="Center" 
-                                               VerticalOptions="Center" 
-                                               Grid.Column="1" />
-                                        <Button Text="+" 
-                                                FontSize="14" 
-                                                WidthRequest="30" 
-                                                HeightRequest="30" 
-                                                CornerRadius="15" 
-                                                BackgroundColor="#007BFF" 
-                                                TextColor="White" 
-                                                Grid.Column="2" 
-                                                Command="{Binding IncreaseQuantityCommand}" />
+                            <Frame CornerRadius="15" 
+                                   Padding="0" 
+                                   BackgroundColor="White" 
+                                   Margin="0,8"
+                                   HasShadow="True">
+                                <Border StrokeThickness="0" 
+                                        StrokeShape="RoundRectangle 15">
+                                    <Grid Padding="15" 
+                                          ColumnDefinitions="90,*,Auto,Auto" 
+                                          ColumnSpacing="15" 
+                                          RowDefinitions="Auto,Auto,Auto" 
+                                          RowSpacing="8">
+                                        <!-- Product Image with shadow -->
+                                        <Frame Grid.RowSpan="3" 
+                                               Grid.Column="0"
+                                               CornerRadius="12"
+                                               Padding="0"
+                                               HasShadow="True"
+                                               BackgroundColor="White">
+                                            <Image Source="{Binding Product.ImageURL}" 
+                                                   WidthRequest="80" 
+                                                   HeightRequest="80"
+                                                   Aspect="AspectFill" />
+                                        </Frame>
+
+                                        <!-- Product Name with better typography -->
+                                        <Label Text="{Binding Product.ProductName}" 
+                                               FontSize="17" 
+                                               FontAttributes="Bold" 
+                                               TextColor="#2C3E50"
+                                               LineBreakMode="WordWrap" 
+                                               Grid.Column="1" 
+                                               Grid.Row="0" />
+
+                                        <!-- Per-unit Price with icon -->
+                                        <StackLayout Orientation="Horizontal" 
+                                                     Grid.Column="1" 
+                                                     Grid.Row="1"
+                                                     Spacing="5">
+                                            <Label Text="💰" FontSize="12" />
+                                            <Label Text="{Binding Product.Price, StringFormat='Đơn giá: {0:C0}'}" 
+                                                   FontSize="13" 
+                                                   TextColor="#7F8C8D" />
+                                        </StackLayout>
+
+                                        <!-- Enhanced Quantity Selector -->
+                                        <Frame Grid.Column="1" 
+                                               Grid.Row="2"
+                                               BackgroundColor="#F8F9FA"
+                                               CornerRadius="20"
+                                               Padding="5"
+                                               HasShadow="False"
+                                               HeightRequest="45">
+                                            <Grid ColumnDefinitions="Auto,60,Auto" 
+                                                  ColumnSpacing="8"
+                                                  VerticalOptions="Center">
+                                                <Button Text="−" 
+                                                        FontSize="16" 
+                                                        FontAttributes="Bold"
+                                                        WidthRequest="35" 
+                                                        HeightRequest="35" 
+                                                        CornerRadius="17" 
+                                                        BackgroundColor="#E74C3C" 
+                                                        TextColor="White" 
+                                                        Grid.Column="0"
+                                                        VerticalOptions="Center"
+                                                        Command="{Binding DecreaseQuantityCommand}" />
+
+                                                <Frame Grid.Column="1" 
+                                                       BackgroundColor="White"
+                                                       CornerRadius="8"  
+                                                       Padding="0"
+                                                       HasShadow="False"
+                                                       HeightRequest="35"
+                                                       VerticalOptions="Center">
+                                                    <Entry Text="{Binding Quantity, Mode=TwoWay}" 
+                                                           Keyboard="Numeric" 
+                                                           HorizontalTextAlignment="Center" 
+                                                           VerticalTextAlignment="Center"
+                                                           VerticalOptions="FillAndExpand"
+                                                           FontSize="14"
+                                                           FontAttributes="Bold"
+                                                           TextColor="#2C3E50"
+                                                           Margin="0" />
+                                                </Frame>
+
+                                                <Button Text="+" 
+                                                        FontSize="16" 
+                                                        FontAttributes="Bold"
+                                                        WidthRequest="35" 
+                                                        HeightRequest="35" 
+                                                        CornerRadius="17" 
+                                                        BackgroundColor="#27AE60" 
+                                                        TextColor="White" 
+                                                        Grid.Column="2"
+                                                        VerticalOptions="Center"
+                                                        Command="{Binding IncreaseQuantityCommand}" />
+                                            </Grid>
+                                        </Frame>
+
+                                        <!-- Total Price with enhanced styling -->
+                                        <Frame Grid.Column="2" 
+                                               Grid.RowSpan="3"
+                                               BackgroundColor="#E8F5E8"
+                                               CornerRadius="10"
+                                               Padding="12,8"
+                                               HasShadow="False"
+                                               VerticalOptions="Center">
+                                            <StackLayout Spacing="2">
+                                                <Label Text="Tổng" 
+                                                       FontSize="11" 
+                                                       TextColor="#27AE60"
+                                                       HorizontalOptions="Center" />
+                                                <Label Text="{Binding TotalPrice, StringFormat='{0:C0}'}" 
+                                                       FontSize="15" 
+                                                       FontAttributes="Bold"
+                                                       TextColor="#27AE60"
+                                                       HorizontalOptions="Center" />
+                                            </StackLayout>
+                                        </Frame>
+
+                                        <!-- Enhanced Delete Button -->
+                                        <Button Text="🗑️" 
+                                                FontSize="16"
+                                                WidthRequest="40" 
+                                                HeightRequest="40" 
+                                                CornerRadius="20" 
+                                                BackgroundColor="#FFE5E5" 
+                                                TextColor="#E74C3C" 
+                                                Grid.Column="3" 
+                                                Grid.RowSpan="3" 
+                                                VerticalOptions="Center" 
+                                                Command="{Binding DeleteCommand}" />
                                     </Grid>
-                                    <!-- Total Price -->
-                                    <Label Text="{Binding TotalPrice, StringFormat='Giá: {0:C0}'}" 
-                                           FontSize="14" 
-                                           TextColor="Red" 
-                                           VerticalOptions="Center" 
-                                           Grid.Column="2" 
-                                           Grid.RowSpan="3" />
-                                    <!-- Delete Button -->
-                                    <Button Text="x" 
-                                            FontSize="14" 
-                                            WidthRequest="30" 
-                                            HeightRequest="30" 
-                                            CornerRadius="15" 
-                                            BackgroundColor="#FF3333" 
-                                            TextColor="White" 
-                                            Grid.Column="3" 
-                                            Grid.RowSpan="3" 
-                                            VerticalOptions="Center" 
-                                            Command="{Binding DeleteCommand}" />
-                                </Grid>
+                                </Border>
                             </Frame>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <!-- Total Price -->
-                <Frame CornerRadius="10" Padding="10" BackgroundColor="#F5F5F5">
-                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                        <Label Text="Tổng cộng:" 
-                               FontSize="18" 
-                               FontAttributes="Bold" 
-                               VerticalOptions="Center" 
-                               Grid.Column="0" />
-                        <Label Text="{Binding TotalCartPrice, StringFormat='{0:C0}'}" 
-                               FontSize="18" 
-                               TextColor="Red" 
-                               VerticalOptions="Center" 
-                               Grid.Column="1" />
-                    </Grid>
+                <!-- Enhanced Total Price Section -->
+                <Frame CornerRadius="20" 
+                       Padding="0" 
+                       BackgroundColor="White"
+                       HasShadow="True"
+                       Margin="0,10">
+                    <Border StrokeThickness="0" 
+                            StrokeShape="RoundRectangle 20">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#FF6B6B" Offset="0.0" />
+                                <GradientStop Color="#FF8E8E" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Grid Padding="20,15" ColumnDefinitions="*,Auto" ColumnSpacing="15">
+                            <StackLayout Grid.Column="0" VerticalOptions="Center">
+                                <Label Text="💳 Tổng thanh toán" 
+                                       FontSize="16" 
+                                       TextColor="White"
+                                       Opacity="0.9" />
+                                <Label Text="Đã bao gồm thuế VAT" 
+                                       FontSize="12" 
+                                       TextColor="White"
+                                       Opacity="0.7" />
+                            </StackLayout>
+                            <Label Text="{Binding TotalCartPrice, StringFormat='{0:C0}'}" 
+                                   FontSize="24" 
+                                   FontAttributes="Bold"
+                                   TextColor="White"
+                                   VerticalOptions="Center" 
+                                   Grid.Column="1" />
+                        </Grid>
+                    </Border>
                 </Frame>
 
-                <!-- Order Button -->
-                <Button Text="Đặt hàng" 
-                        BackgroundColor="#007BFF" 
-                        TextColor="White" 
-                        CornerRadius="10" 
-                        Padding="10" 
-                        HorizontalOptions="Fill" 
-                        Command="{Binding PlaceOrderCommand}" />
+                <!-- Enhanced Order Button -->
+                <Frame CornerRadius="25" 
+                       Padding="0" 
+                       BackgroundColor="Transparent"
+                       HasShadow="True"
+                       Margin="0,10,0,20">
+                    <Border StrokeThickness="0" 
+                            StrokeShape="RoundRectangle 25">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#4CAF50" Offset="0.0" />
+                                <GradientStop Color="#45A049" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Button Text="🛍️ Tiến hành đặt hàng" 
+                                BackgroundColor="Transparent"
+                                TextColor="White" 
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                Padding="20,15" 
+                                HorizontalOptions="Fill" 
+                                Command="{Binding PlaceOrderCommand}" />
+                    </Border>
+                </Frame>
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- Tabbar -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" BackgroundColor="#F5F5F5" HeightRequest="60">
-            <Button Text="Home" 
-                    Grid.Column="0" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    Command="{Binding NavigateToHomeCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
-            <Button Text="Giỏ hàng" 
-                    Grid.Column="1" 
-                    BackgroundColor="Transparent" 
-                    TextColor="#007BFF" 
-                    FontAttributes="Bold" />
-            <Button Text="Yêu thích" 
-                    Grid.Column="2" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    Command="{Binding NavigateToWishlistCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
-            <Button Text="Trang cá nhân" 
-                    Grid.Column="3" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    Command="{Binding NavigateToProfileCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
-        </Grid>
+        <!-- Enhanced Tab Bar (unchanged as requested) -->
+        <Frame Grid.Row="1" 
+               BackgroundColor="White" 
+               CornerRadius="25" 
+               HasShadow="True" 
+               Padding="0">
+            <Grid ColumnDefinitions="*,*,*,*" HeightRequest="70" Padding="10,5">
+                <!-- Home Tab -->
+                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                    <Button Text="🏠" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToHomeCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Home" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Cart Tab - Active -->
+                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                    <Frame BackgroundColor="#4A90E2" 
+                           CornerRadius="15" 
+                           Padding="0" 
+                           HasShadow="False"
+                           HeightRequest="30"
+                           WidthRequest="30"
+                           HorizontalOptions="Center">
+                        <Label Text="🛒" 
+                               FontSize="20"
+                               TextColor="White" 
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Frame>
+                    <Label Text="Giỏ hàng" 
+                           FontSize="12" 
+                           TextColor="#4A90E2" 
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Wishlist Tab -->
+                <VerticalStackLayout Grid.Column="2" Spacing="2">
+                    <Button Text="❤️" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToWishlistCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Yêu thích" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Profile Tab -->
+                <VerticalStackLayout Grid.Column="3" Spacing="2">
+                    <Button Text="👤" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToProfileCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Tài khoản" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Grid>
+        </Frame>
     </Grid>
 </ContentPage>

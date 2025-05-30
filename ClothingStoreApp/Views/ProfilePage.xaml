@@ -3,107 +3,264 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:ClothingStoreApp.ViewModels"
              x:Class="ClothingStoreApp.Views.ProfilePage"
-             x:Name="ThisPage">
+             x:Name="ThisPage"
+             BackgroundColor="#F8F9FA">
 
     <Grid RowDefinitions="*, Auto">
         <ScrollView Grid.Row="0">
-            <VerticalStackLayout Spacing="5" Padding="10" VerticalOptions="Start">
-                <Button Text="Xem thông tin cá nhân"
-                        BackgroundColor="#007BFF"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="50"
-                        Command="{Binding ViewUserInfoCommand}" />
-                <Button Text="Đổi mật khẩu"
-                        BackgroundColor="#FD7E14"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="50"
-                        Command="{Binding ChangepasswordCommand}" />
+            <VerticalStackLayout Spacing="15" Padding="20" VerticalOptions="Start">
 
-                <!-- Button to toggle Order List visibility -->
-                <Button Text="Xem lịch sử đơn hàng"
-                        BackgroundColor="#28A745"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="50"
-                        Command="{Binding ToggleOrderListCommand}" />
+                <!-- Header Section -->
+             
 
-                <!-- Order List with visibility binding -->
-                <VerticalStackLayout IsVisible="{Binding IsOrderListVisible}" Spacing="5">
-                    <Label Text="Lịch sử đơn hàng" FontSize="Large" FontAttributes="Bold" Margin="0,10,0,5" />
-                    <CollectionView ItemsSource="{Binding Orders}" HeightRequest="300">
-                        <CollectionView.EmptyView>
-                            <Label Text="Bạn chưa có đơn hàng nào." 
-                                   HorizontalOptions="Center" 
-                                   VerticalOptions="Center"
-                                   FontSize="Medium"
-                                   TextColor="Gray" />
-                        </CollectionView.EmptyView>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Frame BackgroundColor="#F5F5F5" CornerRadius="10" Padding="10" Margin="0,5">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <VerticalStackLayout Grid.Column="0" Spacing="5">
-                                            <Label Text="{Binding OrderID, StringFormat='Đơn hàng #{0}'}" 
-                                                   FontSize="Medium" FontAttributes="Bold" />
-                                            <Label Text="{Binding OrderDate, StringFormat='Ngày đặt: {0:dd/MM/yyyy HH:mm}'}"
-                                                   FontSize="Small" />
-                                            <Label Text="{Binding TotalAmount, StringFormat='Tổng tiền: {0:C0}'}"
-                                                   FontSize="Small" />
-                                            <Label Text="{Binding Address, StringFormat='Địa chỉ: {0}'}"
-                                                   FontSize="Small" />
-                                        </VerticalStackLayout>
-                                        <Label Grid.Column="1" 
-                                               Text="Xem chi tiết" 
-                                               TextColor="#007BFF" 
-                                               FontAttributes="Bold" 
-                                               VerticalOptions="Center" />
-                                    </Grid>
-                                    <Frame.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.ViewOrderDetailsCommand}"
-                                                              CommandParameter="{Binding .}" />
-                                    </Frame.GestureRecognizers>
-                                </Frame>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </VerticalStackLayout>
+                <!-- Profile Actions -->
+                <Frame BackgroundColor="White" 
+                       CornerRadius="20" 
+                       HasShadow="True" 
+                       Padding="20">
+                    <VerticalStackLayout Spacing="12">
 
-                <Button Text="Đăng xuất"
-                        BackgroundColor="#DC3545"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="50"
-                        Command="{Binding LogoutCommand}" />
+                        <!-- View Profile Button -->
+                        <Frame BackgroundColor="#4A90E2" 
+                               CornerRadius="15" 
+                               HasShadow="False" 
+                               Padding="0">
+                            <Button Text="👤  Xem thông tin cá nhân"
+                                    BackgroundColor="Transparent"
+                                    TextColor="White"
+                                    FontSize="16"
+                                    FontAttributes="Bold"
+                                    HeightRequest="55"
+                                    Command="{Binding ViewUserInfoCommand}" />
+                        </Frame>
+
+                        <!-- Change Password Button -->
+                        <Frame BackgroundColor="#FF6B35" 
+                               CornerRadius="15" 
+                               HasShadow="False" 
+                               Padding="0">
+                            <Button Text="🔐  Đổi mật khẩu"
+                                    BackgroundColor="Transparent"
+                                    TextColor="White"
+                                    FontSize="16"
+                                    FontAttributes="Bold"
+                                    HeightRequest="55"
+                                    Command="{Binding ChangepasswordCommand}" />
+                        </Frame>
+
+                        <!-- Order History Button -->
+                        <Frame BackgroundColor="#28A745" 
+                               CornerRadius="15" 
+                               HasShadow="False" 
+                               Padding="0">
+                            <Button Text="📋  Xem lịch sử đơn hàng"
+                                    BackgroundColor="Transparent"
+                                    TextColor="White"
+                                    FontSize="16"
+                                    FontAttributes="Bold"
+                                    HeightRequest="55"
+                                    Command="{Binding ToggleOrderListCommand}" />
+                        </Frame>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Order List Section -->
+                <Frame BackgroundColor="White" 
+                       CornerRadius="20" 
+                       HasShadow="True" 
+                       Padding="20"
+                       IsVisible="{Binding IsOrderListVisible}">
+                    <VerticalStackLayout Spacing="15">
+                        <StackLayout Orientation="Horizontal" Spacing="10">
+                            <Label Text="📦" FontSize="20" VerticalOptions="Center" />
+                            <Label Text="Lịch sử đơn hàng" 
+                                   FontSize="20" 
+                                   FontAttributes="Bold" 
+                                   TextColor="#2C3E50"
+                                   VerticalOptions="Center" />
+                        </StackLayout>
+
+                        <CollectionView ItemsSource="{Binding Orders}" HeightRequest="300">
+                            <CollectionView.EmptyView>
+                                <VerticalStackLayout Spacing="10" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Label Text="🛒" FontSize="40" HorizontalOptions="Center" />
+                                    <Label Text="Bạn chưa có đơn hàng nào." 
+                                           HorizontalOptions="Center" 
+                                           VerticalOptions="Center"
+                                           FontSize="16"
+                                           TextColor="#7F8C8D" />
+                                </VerticalStackLayout>
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame BackgroundColor="#F8F9FA" 
+                                           CornerRadius="15" 
+                                           Padding="15" 
+                                           Margin="0,5"
+                                           HasShadow="False"
+                                           BorderColor="#E9ECEF">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <VerticalStackLayout Grid.Column="0" Spacing="8">
+                                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                                    <Label Text="🧾" FontSize="16" VerticalOptions="Center" />
+                                                    <Label Text="{Binding OrderID, StringFormat='Đơn hàng #{0}'}" 
+                                                           FontSize="16" 
+                                                           FontAttributes="Bold"
+                                                           TextColor="#2C3E50" 
+                                                           VerticalOptions="Center" />
+                                                </StackLayout>
+                                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                                    <Label Text="📅" FontSize="14" VerticalOptions="Center" />
+                                                    <Label Text="{Binding OrderDate, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                                           FontSize="14" 
+                                                           TextColor="#7F8C8D"
+                                                           VerticalOptions="Center" />
+                                                </StackLayout>
+                                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                                    <Label Text="💰" FontSize="14" VerticalOptions="Center" />
+                                                    <Label Text="{Binding TotalAmount, StringFormat='{0:C0}'}"
+                                                           FontSize="14" 
+                                                           FontAttributes="Bold"
+                                                           TextColor="#E74C3C"
+                                                           VerticalOptions="Center" />
+                                                </StackLayout>
+                                                <StackLayout Orientation="Horizontal" Spacing="5">
+                                                    <Label Text="📍" FontSize="14" VerticalOptions="Center" />
+                                                    <Label Text="{Binding Address}"
+                                                           FontSize="14" 
+                                                           TextColor="#7F8C8D"
+                                                           VerticalOptions="Center"
+                                                           LineBreakMode="TailTruncation" />
+                                                </StackLayout>
+                                            </VerticalStackLayout>
+                                            <Frame Grid.Column="1" 
+                                                   BackgroundColor="#4A90E2" 
+                                                   CornerRadius="20" 
+                                                   Padding="10,5"
+                                                   HasShadow="False"
+                                                   VerticalOptions="Center">
+                                                <Label Text="👁️ Chi tiết" 
+                                                       TextColor="White" 
+                                                       FontAttributes="Bold" 
+                                                       FontSize="12"
+                                                       VerticalOptions="Center" />
+                                            </Frame>
+                                        </Grid>
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.ViewOrderDetailsCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Frame.GestureRecognizers>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Logout Section -->
+                <Frame BackgroundColor="White" 
+                       CornerRadius="20" 
+                       HasShadow="True" 
+                       Padding="20">
+                    <Frame BackgroundColor="#DC3545" 
+                           CornerRadius="15" 
+                           HasShadow="False" 
+                           Padding="0">
+                        <Button Text="🚪  Đăng xuất"
+                                BackgroundColor="Transparent"
+                                TextColor="White"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                HeightRequest="55"
+                                Command="{Binding LogoutCommand}" />
+                    </Frame>
+                </Frame>
+
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- Tab bar cố định ở dưới -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" BackgroundColor="#F5F5F5" HeightRequest="60">
-            <Button Text="Home" 
-                    Grid.Column="0" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    Command="{Binding NavigateToHomeCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
-            <Button Text="Giỏ hàng" 
-                    Grid.Column="1" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    Command="{Binding NavigateToCartCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
-            <Button Text="Yêu thích" 
-                    Grid.Column="2" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    Command="{Binding NavigateToWishlistCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
-            <Button Text="Trang cá nhân" 
-                    Grid.Column="3" 
-                    BackgroundColor="Transparent" 
-                    TextColor="#007BFF" 
-                    FontAttributes="Bold"/>
-        </Grid>
+        <!-- Enhanced Tab Bar -->
+        <Frame Grid.Row="1" 
+               BackgroundColor="White" 
+               CornerRadius="25" 
+               HasShadow="True" 
+               Padding="0">
+            <Grid ColumnDefinitions="*,*,*,*" HeightRequest="70" Padding="10,5">
+
+                <!-- Home Tab -->
+                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                    <Button Text="🏠" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToHomeCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Home" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Cart Tab -->
+                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                    <Button Text="🛒" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToCartCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Giỏ hàng" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Wishlist Tab -->
+                <VerticalStackLayout Grid.Column="2" Spacing="2">
+                    <Button Text="❤️" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToWishlistCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Yêu thích" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Profile Tab - Active -->
+                <VerticalStackLayout Grid.Column="3" Spacing="2">
+                    <Frame BackgroundColor="#4A90E2" 
+                           CornerRadius="15" 
+                           Padding="0" 
+                           HasShadow="False"
+                           HeightRequest="30"
+                           WidthRequest="30"
+                           HorizontalOptions="Center">
+                        <Label Text="👤" 
+                               FontSize="20"
+                               TextColor="White" 
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Frame>
+                    <Label Text="Tài khoản" 
+                           FontSize="12" 
+                           TextColor="#4A90E2" 
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+            </Grid>
+        </Frame>
     </Grid>
 </ContentPage>

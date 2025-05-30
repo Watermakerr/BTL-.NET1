@@ -1,5 +1,6 @@
 using ClothingStoreApp.ViewModels;
 using ClothingStoreApp.Models;
+using ClothingStoreApp.Converters;
 
 namespace ClothingStoreApp.Views
 {
@@ -8,6 +9,7 @@ namespace ClothingStoreApp.Views
         public OrderDetailPage(Order order)
         {
             InitializeComponent();
+            Resources.Add("QuantityPriceConverter", new QuantityPriceConverter());
             BindingContext = new OrderDetailViewModel(order);
         }
     }

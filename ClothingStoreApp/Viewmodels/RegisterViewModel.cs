@@ -1,11 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ClothingStoreApp.Services;
-using System.Threading.Tasks;
-using Microsoft.Maui.Controls; // Thêm để dùng ContentPage
-using System; // Thêm để dùng Color
 using ClothingStoreApp.Views;
-
+using System.Threading.Tasks;
+using Microsoft.Maui.Controls;
+using System;
 
 namespace ClothingStoreApp.ViewModels;
 
@@ -23,6 +22,9 @@ public partial class RegisterViewModel : ObservableObject
     private string _phoneNumber;
 
     [ObservableProperty]
+    private string _address;
+
+    [ObservableProperty]
     private string _message;
 
     [ObservableProperty]
@@ -31,7 +33,6 @@ public partial class RegisterViewModel : ObservableObject
     [ObservableProperty]
     private Color _messageColor;
 
-    // ✅ Constructor đúng cú pháp
     public RegisterViewModel(SqlService sqlService)
     {
         _sqlService = sqlService;
@@ -40,7 +41,6 @@ public partial class RegisterViewModel : ObservableObject
     [RelayCommand]
     private async Task Register(object parameter)
     {
-        // parameter là ContentPage được truyền từ XAML
         if (parameter is not ContentPage page)
         {
             Message = "Lỗi điều hướng.";
@@ -49,7 +49,8 @@ public partial class RegisterViewModel : ObservableObject
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password) || string.IsNullOrWhiteSpace(PhoneNumber))
+        if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password) ||
+            string.IsNullOrWhiteSpace(PhoneNumber) || string.IsNullOrWhiteSpace(Address))
         {
             Message = "Vui lòng nhập đầy đủ thông tin.";
             MessageColor = Colors.Red;
@@ -57,7 +58,7 @@ public partial class RegisterViewModel : ObservableObject
             return;
         }
 
-        bool isRegistered = _sqlService.RegisterUser(Username, Password, PhoneNumber);
+        bool isRegistered = _sqlService.RegisterUser(Username, Password, PhoneNumber, Address);
 
         if (isRegistered)
         {

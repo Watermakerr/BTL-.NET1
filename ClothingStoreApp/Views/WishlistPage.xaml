@@ -3,69 +3,241 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:ClothingStoreApp.ViewModels"
              x:Class="ClothingStoreApp.Views.WishlistPage"
-             BackgroundColor="White"
              x:Name="ThisPage">
+
+    <!-- Gradient Background -->
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#F8F9FA" Offset="0.0" />
+            <GradientStop Color="#E9ECEF" Offset="1.0" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
     <Grid RowDefinitions="*,Auto">
         <ScrollView Grid.Row="0">
-            <VerticalStackLayout Spacing="15" Padding="15">
-                <Label Text="Danh sách yêu thích" 
-                       FontSize="24" 
-                       FontAttributes="Bold" 
-                       HorizontalTextAlignment="Center" 
-                       TextColor="#333333" />
+            <VerticalStackLayout Spacing="20" Padding="20">
 
-                <!-- Empty State -->
-                <Frame IsVisible="{Binding IsWishlistEmpty}"
-                       CornerRadius="10" 
-                       Padding="15" 
-                       BackgroundColor="#F5F5F5" 
-                       HorizontalOptions="Center" 
-                       VerticalOptions="CenterAndExpand">
+                <!-- Animated Header with Icon -->
+                <Frame BackgroundColor="Transparent" 
+                       Padding="0" 
+                       HasShadow="False">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="Danh sách yêu thích trống" 
-                               FontSize="18" 
+                        <!-- Heart Icon with Gradient Background -->
+                        <Frame BackgroundColor="#FF6B8A" 
+                               CornerRadius="30" 
+                               HeightRequest="60" 
+                               WidthRequest="60" 
+                               HasShadow="True"
+                               HorizontalOptions="Center">
+                            <Frame.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#FF6B8A" Offset="0.0" />
+                                    <GradientStop Color="#FF8E9B" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Frame.Background>
+                            <Label Text="💖" 
+                                   FontSize="28" 
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center" />
+                        </Frame>
+
+                        <!-- Title with Modern Typography -->
+                        <Label Text="Danh sách yêu thích" 
+                               FontSize="28" 
                                FontAttributes="Bold" 
-                               TextColor="#666666" 
-                               HorizontalTextAlignment="Center" />
-                        <Label Text="Hãy thêm sản phẩm yêu thích của bạn!" 
-                               FontSize="14" 
-                               TextColor="#666666" 
-                               HorizontalTextAlignment="Center" />
+                               HorizontalTextAlignment="Center" 
+                               TextColor="#2C3E50">
+                            <Label.Shadow>
+                                <Shadow Brush="#E0E0E0" Offset="0,2" Radius="4" Opacity="0.3" />
+                            </Label.Shadow>
+                        </Label>
+
+                        <!-- Decorative Line -->
+                        <BoxView HeightRequest="3" 
+                                 WidthRequest="80" 
+                                 CornerRadius="1.5" 
+                                 HorizontalOptions="Center">
+                            <BoxView.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#FF6B8A" Offset="0.0" />
+                                    <GradientStop Color="#4A90E2" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </BoxView.Background>
+                        </BoxView>
                     </VerticalStackLayout>
                 </Frame>
 
-                <!-- Wishlist Products -->
+                <!-- Enhanced Empty State -->
+                <Frame IsVisible="{Binding IsWishlistEmpty}"
+                       CornerRadius="20" 
+                       Padding="30" 
+                       HasShadow="True"
+                       HorizontalOptions="FillAndExpand" 
+                       VerticalOptions="CenterAndExpand">
+                    <Frame.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#FFFFFF" Offset="0.0" />
+                            <GradientStop Color="#F8F9FA" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Frame.Background>
+                    <Frame.Shadow>
+                        <Shadow Brush="#E0E0E0" Offset="0,8" Radius="16" Opacity="0.15" />
+                    </Frame.Shadow>
+
+                    <VerticalStackLayout Spacing="20">
+                        <!-- Empty State Illustration -->
+                        <Frame BackgroundColor="#F1F3F4" 
+                               CornerRadius="40" 
+                               HeightRequest="80" 
+                               WidthRequest="80" 
+                               HasShadow="False"
+                               HorizontalOptions="Center">
+                            <Label Text="💔" 
+                                   FontSize="40" 
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center" 
+                                   Opacity="0.7" />
+                        </Frame>
+
+                        <Label Text="Danh sách yêu thích trống" 
+                               FontSize="20" 
+                               FontAttributes="Bold" 
+                               TextColor="#34495E" 
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Hãy thêm những sản phẩm yêu thích của bạn để tạo nên bộ sưu tập độc đáo!" 
+                               FontSize="16" 
+                               TextColor="#7F8C8D" 
+                               HorizontalTextAlignment="Center"
+                               LineBreakMode="WordWrap" />
+
+                        <!-- Call to Action Button -->
+                        <Frame BackgroundColor="#4A90E2" 
+                               CornerRadius="25" 
+                               Padding="15,10" 
+                               HasShadow="True"
+                               HorizontalOptions="Center"
+                               Margin="0,10,0,0">
+                            <Frame.Shadow>
+                                <Shadow Brush="#4A90E2" Offset="0,4" Radius="8" Opacity="0.3" />
+                            </Frame.Shadow>
+                            <Label Text="Khám phá ngay ✨" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold"
+                                   TextColor="White" 
+                                   HorizontalTextAlignment="Center" />
+                        </Frame>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Enhanced Wishlist Products -->
                 <CollectionView ItemsSource="{Binding WishlistProducts}"
                                IsVisible="{Binding HasWishlistProducts}"
-                               SelectionMode="None">
+                               SelectionMode="None"
+                               ItemSizingStrategy="MeasureAllItems">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame CornerRadius="10" 
-                                   Padding="10" 
-                                   BackgroundColor="White" 
-                                   Margin="0,5"
+                            <Frame CornerRadius="16" 
+                                   Padding="15" 
+                                   Margin="0,8"
                                    HasShadow="True">
+                                <!-- Enhanced Background with Gradient -->
+                                <Frame.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#FFFFFF" Offset="0.0" />
+                                        <GradientStop Color="#FAFBFC" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Frame.Background>
+                                <Frame.Shadow>
+                                    <Shadow Brush="#E0E0E0" Offset="0,6" Radius="12" Opacity="0.12" />
+                                </Frame.Shadow>
+
                                 <Frame.GestureRecognizers>
                                     <TapGestureRecognizer 
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:WishlistViewModel}}, Path=NavigateToProductDetailCommand}"
                                         CommandParameter="{Binding ProductID}" />
                                 </Frame.GestureRecognizers>
-                                <Grid ColumnDefinitions="100,*" ColumnSpacing="10">
-                                    <Image Source="{Binding ImageURL}" 
-                                           Aspect="AspectFill" 
-                                           WidthRequest="80" 
-                                           HeightRequest="80" 
-                                           VerticalOptions="Center" />
-                                    <VerticalStackLayout Grid.Column="1" Spacing="5">
+
+                                <Grid ColumnDefinitions="110,*,Auto" ColumnSpacing="15">
+                                    <!-- Enhanced Product Image -->
+                                    <Frame Grid.Column="0" 
+                                           CornerRadius="12" 
+                                           Padding="0" 
+                                           HasShadow="True"
+                                           BackgroundColor="White">
+                                        <Frame.Shadow>
+                                            <Shadow Brush="#E0E0E0" Offset="0,4" Radius="8" Opacity="0.15" />
+                                        </Frame.Shadow>
+                                        <Image Source="{Binding ImageURL}" 
+                                               Aspect="AspectFill" 
+                                               WidthRequest="95" 
+                                               HeightRequest="95" 
+                                               VerticalOptions="Center" />
+                                    </Frame>
+
+                                    <!-- Product Information -->
+                                    <VerticalStackLayout Grid.Column="1" 
+                                                       Spacing="8" 
+                                                       VerticalOptions="Center">
                                         <Label Text="{Binding ProductName}" 
-                                               FontSize="16" 
+                                               FontSize="18" 
                                                FontAttributes="Bold" 
-                                               TextColor="#333333"
-                                               LineBreakMode="TailTruncation" />
-                                        <Label Text="{Binding Price, StringFormat='Giá: {0:C0}'}" 
-                                               FontSize="14" 
-                                               TextColor="Red" />
+                                               TextColor="#2C3E50"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="2" />
+
+                                        <!-- Price with Enhanced Styling -->
+                                        <Frame BackgroundColor="#FF6B8A" 
+                                               CornerRadius="12" 
+                                               Padding="8,4" 
+                                               HasShadow="False"
+                                               HorizontalOptions="Start">
+                                            <Frame.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                    <GradientStop Color="#FF6B8A" Offset="0.0" />
+                                                    <GradientStop Color="#FF8E9B" Offset="1.0" />
+                                                </LinearGradientBrush>
+                                            </Frame.Background>
+                                            <Label Text="{Binding Price, StringFormat='{0:C0}'}" 
+                                                   FontSize="16" 
+                                                   FontAttributes="Bold"
+                                                   TextColor="White" />
+                                        </Frame>
+
+                                        <!-- Product Status/Badge -->
+                                        <Frame BackgroundColor="#E8F5E8" 
+                                               CornerRadius="8" 
+                                               Padding="6,3" 
+                                               HasShadow="False"
+                                               HorizontalOptions="Start">
+                                            <Label Text="Còn hàng" 
+                                                   FontSize="12" 
+                                                   FontAttributes="Bold"
+                                                   TextColor="#27AE60" />
+                                        </Frame>
                                     </VerticalStackLayout>
+
+                                    <!-- Action Heart Icon -->
+                                    <Frame Grid.Column="2" 
+                                           BackgroundColor="#FF6B8A" 
+                                           CornerRadius="20" 
+                                           HeightRequest="40" 
+                                           WidthRequest="40" 
+                                           HasShadow="True"
+                                           VerticalOptions="Center">
+                                        <Frame.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                <GradientStop Color="#FF6B8A" Offset="0.0" />
+                                                <GradientStop Color="#FF8E9B" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </Frame.Background>
+                                        <Frame.Shadow>
+                                            <Shadow Brush="#FF6B8A" Offset="0,3" Radius="6" Opacity="0.3" />
+                                        </Frame.Shadow>
+                                        <Label Text="❤️" 
+                                               FontSize="18" 
+                                               HorizontalOptions="Center" 
+                                               VerticalOptions="Center" />
+                                    </Frame>
                                 </Grid>
                             </Frame>
                         </DataTemplate>
@@ -74,34 +246,86 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- Tabbar -->
-        <Grid Grid.Row="1" 
-              ColumnDefinitions="*,*,*,*" 
-              BackgroundColor="#F5F5F5" 
-              HeightRequest="60">
-            <Button Text="Home" 
-                    Grid.Column="0" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    Command="{Binding NavigateToHomeCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
-            <Button Text="Giỏ hàng" 
-                    Grid.Column="1" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    Command="{Binding NavigateToCartCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
-            <Button Text="Yêu thích" 
-                    Grid.Column="2" 
-                    BackgroundColor="Transparent" 
-                    TextColor="#007BFF" 
-                    FontAttributes="Bold"/>
-            <Button Text="Trang cá nhân" 
-                    Grid.Column="3" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black" 
-                    Command="{Binding NavigateToProfileCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}"/>
-        </Grid>
+        <!-- Enhanced Tab Bar -->
+        <Frame Grid.Row="1" 
+               BackgroundColor="White" 
+               CornerRadius="25" 
+               HasShadow="True" 
+               Padding="0">
+            <Grid ColumnDefinitions="*,*,*,*" HeightRequest="70" Padding="10,5">
+                <!-- Home Tab -->
+                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                    <Button Text="🏠" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToHomeCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Home" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Cart Tab -->
+                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                    <Button Text="🛒" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToCartCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Giỏ hàng" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Wishlist Tab - Active -->
+                <VerticalStackLayout Grid.Column="2" Spacing="2">
+                    <Frame BackgroundColor="#4A90E2" 
+                           CornerRadius="15" 
+                           Padding="0" 
+                           HasShadow="False"
+                           HeightRequest="30"
+                           WidthRequest="30"
+                           HorizontalOptions="Center">
+                        <Label Text="❤️" 
+                               FontSize="20"
+                               TextColor="White" 
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Frame>
+                    <Label Text="Yêu thích" 
+                           FontSize="12" 
+                           TextColor="#4A90E2" 
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Profile Tab -->
+                <VerticalStackLayout Grid.Column="3" Spacing="2">
+                    <Button Text="👤" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToProfileCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Tài khoản" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Grid>
+        </Frame>
     </Grid>
 </ContentPage>

@@ -69,32 +69,88 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- Tabbar -->
-        <Grid Grid.Row="2" ColumnDefinitions="*,*,*,*" BackgroundColor="#F5F5F5" HeightRequest="60">
-            <Button Text="Home" 
-                    Grid.Column="0" 
-                    BackgroundColor="Transparent" 
-                    TextColor="#007BFF" 
-                    FontAttributes="Bold" />
-            <Button Text="Giỏ hàng" 
-                    Grid.Column="1" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    Command="{Binding NavigateToCartCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
-            <Button Text="Yêu thích" 
-                    Grid.Column="2" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    Command="{Binding NavigateToWishlistCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
-            <Button Text="Trang cá nhân" 
-                    Grid.Column="3" 
-                    BackgroundColor="Transparent" 
-                    TextColor="Black"
-                    Command="{Binding NavigateToProfileCommand}"
-                    CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+        <!-- Enhanced Tab Bar -->
+        <Frame Grid.Row="2" 
+               BackgroundColor="White" 
+               CornerRadius="25" 
+               HasShadow="True" 
+               Padding="0">
+            <Grid ColumnDefinitions="*,*,*,*" HeightRequest="70" Padding="10,5">
 
-        </Grid>
+                <!-- Home Tab - Active -->
+                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                    <Frame BackgroundColor="#4A90E2" 
+                           CornerRadius="15" 
+                           Padding="0" 
+                           HasShadow="False"
+                           HeightRequest="30"
+                           WidthRequest="30"
+                           HorizontalOptions="Center">
+                        <Label Text="🏠" 
+                               FontSize="20"
+                               TextColor="White" 
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Frame>
+                    <Label Text="Home" 
+                           FontSize="12" 
+                           TextColor="#4A90E2" 
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Cart Tab -->
+                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                    <Button Text="🛒" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToCartCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Giỏ hàng" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Wishlist Tab -->
+                <VerticalStackLayout Grid.Column="2" Spacing="2">
+                    <Button Text="❤️" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToWishlistCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Yêu thích" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Profile Tab -->
+                <VerticalStackLayout Grid.Column="3" Spacing="2">
+                    <Button Text="👤" 
+                            FontSize="20"
+                            BackgroundColor="Transparent" 
+                            TextColor="#7F8C8D"
+                            HeightRequest="30"
+                            Padding="0"
+                            BorderWidth="0"
+                            Command="{Binding NavigateToProfileCommand}"
+                            CommandParameter="{Binding Source={x:Reference ThisPage}}" />
+                    <Label Text="Tài khoản" 
+                           FontSize="12" 
+                           TextColor="#7F8C8D" 
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+            </Grid>
+        </Frame>
     </Grid>
 </ContentPage>

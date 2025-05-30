@@ -84,13 +84,15 @@ namespace ClothingStoreApp.Services
             }
         }
 
-        public bool RegisterUser(string username, string password, string phoneNumber)
+        public bool RegisterUser(string username, string password, string phoneNumber, string address)
         {
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
+
+                    // Check if username already exists
                     string checkQuery = "SELECT COUNT(*) FROM Users WHERE Username = @Username";
                     using (SqlCommand checkCommand = new SqlCommand(checkQuery, connection))
                     {
@@ -98,21 +100,22 @@ namespace ClothingStoreApp.Services
                         int count = (int)checkCommand.ExecuteScalar();
                         if (count > 0)
                         {
-                            System.Diagnostics.Debug.WriteLine($"RegisterUser: Username={username} already exists");
-                            return false;
+                            return false; // Username already exists
                         }
                     }
 
-                    string insertQuery = "INSERT INTO Users (Username, Password, PhoneNumber) VALUES (@Username, @Password, @PhoneNumber)";
+                    // Insert new user
+                    string insertQuery = "INSERT INTO Users (Username, Password, PhoneNumber, Address) VALUES (@Username, @Password, @PhoneNumber, @Address)";
                     using (SqlCommand insertCommand = new SqlCommand(insertQuery, connection))
                     {
                         insertCommand.Parameters.AddWithValue("@Username", username);
                         insertCommand.Parameters.AddWithValue("@Password", password);
                         insertCommand.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
+                        insertCommand.Parameters.AddWithValue("@Address", (object)address ?? DBNull.Value);
                         insertCommand.ExecuteNonQuery();
-                        System.Diagnostics.Debug.WriteLine($"RegisterUser: Username={username} registered successfully");
-                        return true;
                     }
+
+                    return true;
                 }
             }
             catch (Exception ex)
@@ -648,7 +651,7 @@ namespace ClothingStoreApp.Services
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    string query = "INSERT INTO Orders (UserID, OrderDate, TotalAmount, Address) VALUES (@UserID, GETDATE(), @TotalAmount, @Address); SELECT SCOPE_IDENTITY();";
+                    string query = "INSERT INTO Orders (UserID, OrderDate, TotalAmount, Address, Status) VALUES (@UserID, GETDATE(), @TotalAmount, @Address, 0); SELECT SCOPE_IDENTITY();";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@UserID", userId);
@@ -762,7 +765,7 @@ namespace ClothingStoreApp.Services
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    string query = "SELECT OrderID, UserID, OrderDate, TotalAmount, Address FROM Orders WHERE UserID = @UserID ORDER BY OrderDate DESC";
+                    string query = "SELECT OrderID, UserID, OrderDate, TotalAmount, Address, Status FROM Orders WHERE UserID = @UserID ORDER BY OrderDate DESC";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@UserID", userId);
@@ -776,7 +779,8 @@ namespace ClothingStoreApp.Services
                                     UserID = reader.GetInt32(1),
                                     OrderDate = reader.GetDateTime(2),
                                     TotalAmount = reader.GetDecimal(3),
-                                    Address = reader.GetString(4)
+                                    Address = reader.GetString(4),
+                                    Status = reader.GetInt32(5)
                                 });
                             }
                         }
@@ -865,25 +869,26 @@ namespace ClothingStoreApp.Services
                                 var cart = new Cart
                                 {
                                     UserID = 0, // Not needed for order details
-                                    ProductID = reader.GetInt32(1),
-                                    Quantity = reader.GetInt32(2),
-                                    AddedDate = DateTime.Now // Placeholder, not stored in OrderDetails
+                                    ProductID = reader.IsDBNull(1) ? 0 : reader.GetInt32(1),
+                                    Quantity = reader.IsDBNull(2) ? 0 : reader.GetInt32(2),
+                                    AddedDate = DateTime.Now // Placeholder
                                 };
                                 Product product = null;
-                                if (!reader.IsDBNull(4))
+                                if (!reader.IsDBNull(4)) // Check if ProductID from Products exists
                                 {
                                     product = new Product
                                     {
                                         ProductID = reader.GetInt32(4),
-                                        ProductName = reader.GetString(5),
-                                        Price = reader.GetDecimal(6),
-                                        QuantitySold = reader.GetInt32(7),
+                                        ProductName = reader.IsDBNull(5) ? "Unknown" : reader.GetString(5),
+                                        Price = reader.IsDBNull(6) ? 0m : reader.GetDecimal(6),
+                                        QuantitySold = reader.IsDBNull(7) ? 0 : reader.GetInt32(7),
                                         Description = reader.IsDBNull(8) ? null : reader.GetString(8),
-                                        CategoryID = reader.GetInt32(9),
+                                        CategoryID = reader.IsDBNull(9) ? 0 : reader.GetInt32(9),
                                         ImageURL = reader.IsDBNull(10) ? null : reader.GetString(10)
                                     };
                                 }
-                                orderItems.Add((cart, product));
+                                orderItems.Add((Cart: cart, Product: product));
+                                System.Diagnostics.Debug.WriteLine($"GetOrderItems: OrderID={orderId}, ProductID={cart.ProductID}, Quantity={cart.Quantity}, ProductName={product?.ProductName ?? "null"}");
                             }
                         }
                     }
@@ -892,9 +897,34 @@ namespace ClothingStoreApp.Services
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"GetOrderItems Error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"GetOrderItems Error: {ex.Message}\nStackTrace: {ex.StackTrace}");
             }
             return orderItems;
+        }
+
+        public bool UpdateOrderStatus(int orderId, int newStatus)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "UPDATE Orders SET Status = @Status WHERE OrderID = @OrderID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Status", newStatus);
+                        command.Parameters.AddWithValue("@OrderID", orderId);
+                        int rowsAffected = command.ExecuteNonQuery();
+                        System.Diagnostics.Debug.WriteLine($"UpdateOrderStatus: OrderID={orderId}, NewStatus={newStatus}, RowsAffected={rowsAffected}");
+                        return rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"UpdateOrderStatus Error: {ex.Message}");
+                return false;
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace ClothingStoreApp.Models
+﻿using System;
+
+namespace ClothingStoreApp.Models
 {
     public class Order
     {
@@ -7,5 +9,6 @@
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
         public string Address { get; set; }
+        public int Status { get; set; }
     }
 }
