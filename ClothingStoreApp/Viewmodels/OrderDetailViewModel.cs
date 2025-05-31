@@ -49,46 +49,32 @@ namespace ClothingStoreApp.ViewModels
 
         private void LoadOrderItems()
         {
-            try
+            var items = _sqlService.GetOrderItems(Order.OrderID);
+            OrderItems.Clear();
+            decimal total = 0;
+            
+            foreach (var (cart, product) in items)
             {
-                var items = _sqlService.GetOrderItems(Order.OrderID);
-                OrderItems.Clear();
-                decimal total = 0;
-                foreach (var (cart, product) in items)
-                {
-                    var wrapped = new OrderItemWrapper(cart, product);
-                    OrderItems.Add(wrapped);
-                    total += cart.Quantity * product.Price;
-                }
-                TotalPrice = total;
+                var wrapped = new OrderItemWrapper(cart, product);
+                OrderItems.Add(wrapped);
+                total += cart.Quantity * product.Price;
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"LoadOrderItems Error: {ex.Message}");
-            }
+            TotalPrice = total;
         }
 
         [RelayCommand]
         private async Task CancelOrder()
         {
-            try
+            bool isCanceled = _sqlService.UpdateOrderStatus(Order.OrderID, 4);
+            if (isCanceled)
             {
-                bool isCanceled = _sqlService.UpdateOrderStatus(Order.OrderID, 4);
-                if (isCanceled)
-                {
-                    Order.Status = 4;
-                    UpdateStatusDisplay();
-                    await Application.Current.MainPage.DisplayAlert("Thông báo", "Đơn hàng đã được hủy.", "OK");
-                }
-                else
-                {
-                    await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể hủy đơn hàng. Vui lòng thử lại.", "OK");
-                }
+                Order.Status = 4;
+                UpdateStatusDisplay();
+                await Application.Current.MainPage.DisplayAlert("Thông báo", "Đơn hàng đã được hủy.", "OK");
             }
-            catch (Exception ex)
+            else
             {
-                System.Diagnostics.Debug.WriteLine($"CancelOrder Error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Đã xảy ra lỗi khi hủy đơn hàng.", "OK");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể hủy đơn hàng.", "OK");
             }
         }
     }

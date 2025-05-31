@@ -425,7 +425,6 @@ namespace ClothingStoreApp.Services
                         }
                     }
                 }
-                System.Diagnostics.Debug.WriteLine($"GetProductsBySearch: Query='{searchQuery}', Found {products.Count} products");
             }
             catch (Exception ex)
             {
@@ -467,7 +466,6 @@ namespace ClothingStoreApp.Services
                         }
                     }
                 }
-                System.Diagnostics.Debug.WriteLine($"GetProductsByCategory: CategoryID={categoryId}, Found {products.Count} products");
             }
             catch (Exception ex)
             {

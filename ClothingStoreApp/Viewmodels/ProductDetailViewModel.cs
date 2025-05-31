@@ -71,31 +71,21 @@ namespace ClothingStoreApp.ViewModels
                 return;
             }
 
-            if (IsInWishlist)
+            bool success = IsInWishlist 
+                ? _sqlService.RemoveFromWishlist(App.CurrentUserId.Value, Product.ProductID)
+                : _sqlService.AddToWishlist(App.CurrentUserId.Value, Product.ProductID);
+
+            if (success)
             {
-                bool success = _sqlService.RemoveFromWishlist(App.CurrentUserId.Value, Product.ProductID);
-                if (success)
-                {
-                    IsInWishlist = false;
-                    HeartIcon = "♡";
-                }
-                else
-                {
-                    await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể xóa khỏi danh sách yêu thích.", "OK");
-                }
+                IsInWishlist = !IsInWishlist;
+                HeartIcon = IsInWishlist ? "♥" : "♡";
             }
             else
             {
-                bool success = _sqlService.AddToWishlist(App.CurrentUserId.Value, Product.ProductID);
-                if (success)
-                {
-                    IsInWishlist = true;
-                    HeartIcon = "♥";
-                }
-                else
-                {
-                    await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể thêm vào danh sách yêu thích.", "OK");
-                }
+                string message = IsInWishlist 
+                    ? "Không thể xóa khỏi danh sách yêu thích." 
+                    : "Không thể thêm vào danh sách yêu thích.";
+                await Application.Current.MainPage.DisplayAlert("Lỗi", message, "OK");
             }
         }
 
@@ -110,7 +100,6 @@ namespace ClothingStoreApp.ViewModels
 
             if (parameter is not ContentPage)
             {
-                System.Diagnostics.Debug.WriteLine("AddToCart: Parameter is not ContentPage");
                 await Application.Current.MainPage.DisplayAlert("Lỗi", "Lỗi điều hướng.", "OK");
                 return;
             }
@@ -124,30 +113,21 @@ namespace ClothingStoreApp.ViewModels
             try
             {
                 bool isInCart = _sqlService.IsProductInCart(App.CurrentUserId.Value, Product.ProductID);
-                bool success;
-                if (isInCart)
-                {
-                    success = _sqlService.UpdateCartItem(App.CurrentUserId.Value, Product.ProductID, Quantity);
-                }
-                else
-                {
-                    success = _sqlService.AddToCart(App.CurrentUserId.Value, Product.ProductID, Quantity);
-                }
+                bool success = isInCart
+                    ? _sqlService.UpdateCartItem(App.CurrentUserId.Value, Product.ProductID, Quantity)
+                    : _sqlService.AddToCart(App.CurrentUserId.Value, Product.ProductID, Quantity);
 
                 if (success)
                 {
                     await Application.Current.MainPage.DisplayAlert("Thành công", "Sản phẩm đã được thêm vào giỏ hàng.", "OK");
-                    System.Diagnostics.Debug.WriteLine($"AddToCart: Added/Updated ProductID={Product.ProductID}, Quantity={Quantity} for UserID={App.CurrentUserId.Value}");
                 }
                 else
                 {
                     await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể thêm sản phẩm vào giỏ hàng.", "OK");
-                    System.Diagnostics.Debug.WriteLine($"AddToCart: Failed for ProductID={Product.ProductID}, UserID={App.CurrentUserId.Value}");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"AddToCart Error: ProductID={Product.ProductID}, Message={ex.Message}");
                 await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi: {ex.Message}", "OK");
             }
         }
@@ -158,7 +138,6 @@ namespace ClothingStoreApp.ViewModels
             if (Quantity < 100)
             {
                 Quantity++;
-                System.Diagnostics.Debug.WriteLine($"IncreaseQuantity: Quantity={Quantity}");
             }
         }
 
@@ -168,7 +147,6 @@ namespace ClothingStoreApp.ViewModels
             if (Quantity > 1)
             {
                 Quantity--;
-                System.Diagnostics.Debug.WriteLine($"DecreaseQuantity: Quantity={Quantity}");
             }
         }
     }

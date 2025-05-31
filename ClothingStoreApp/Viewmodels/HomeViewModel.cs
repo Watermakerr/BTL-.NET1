@@ -31,74 +31,35 @@ namespace ClothingStoreApp.ViewModels
 
         private void LoadCategories()
         {
-            try
+            var categories = _sqlService.GetCategories();
+            Categories.Clear();
+            foreach (var category in categories)
             {
-                var categories = _sqlService.GetCategories();
-                Categories.Clear();
-                foreach (var category in categories)
-                {
-                    Categories.Add(category);
-                }
-                System.Diagnostics.Debug.WriteLine($"LoadCategories: Loaded {Categories.Count} categories.");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"LoadCategories Error: {ex.Message}");
+                Categories.Add(category);
             }
         }
 
         private void LoadTopSellingProducts()
         {
-            try
+            var products = _sqlService.GetTopSellingProducts();
+            TopSellingProducts.Clear();
+            foreach (var product in products)
             {
-                var products = _sqlService.GetTopSellingProducts();
-                TopSellingProducts.Clear();
-                foreach (var product in products)
-                {
-                    TopSellingProducts.Add(product);
-                }
-                System.Diagnostics.Debug.WriteLine($"LoadTopSellingProducts: Loaded {TopSellingProducts.Count} products.");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"LoadTopSellingProducts Error: {ex.Message}");
+                TopSellingProducts.Add(product);
             }
         }
 
         [RelayCommand]
         private async Task NavigateToProductDetail(int productId)
         {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToProductDetail: Navigating to ProductID={productId}");
-                await Application.Current.MainPage.Navigation.PushAsync(new ProductDetailPage(productId));
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToProductDetail Error: ProductID={productId}, Message={ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
-            }
+            await Application.Current.MainPage.Navigation.PushAsync(new ProductDetailPage(productId));
         }
 
         [RelayCommand]
         private async Task NavigateToWishlist(object parameter)
         {
-            if (parameter is not ContentPage page)
-            {
-                System.Diagnostics.Debug.WriteLine("NavigateToWishlist: Parameter is not ContentPage");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Lỗi điều hướng.", "OK");
-                return;
-            }
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("NavigateToWishlist: Navigating to WishlistPage");
-                await page.Navigation.PushAsync(new WishlistPage());
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToWishlist Error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
-            }
+            if (parameter is not ContentPage page) return;
+            await page.Navigation.PushAsync(new WishlistPage());
         }
 
         [RelayCommand]
@@ -109,22 +70,9 @@ namespace ClothingStoreApp.ViewModels
                 await Application.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng nhập từ khóa tìm kiếm.", "OK");
                 return;
             }
-            if (parameter is not ContentPage page)
-            {
-                System.Diagnostics.Debug.WriteLine($"Search: Parameter is not ContentPage for SearchQuery='{SearchQuery}'");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Lỗi điều hướng.", "OK");
-                return;
-            }
-            try
-            {
-                System.Diagnostics.Debug.WriteLine($"Search: Navigating to ProductListPage with SearchQuery='{SearchQuery}'");
-                await page.Navigation.PushAsync(new ProductListPage { SearchQuery = SearchQuery });
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Search Error: SearchQuery='{SearchQuery}', Message={ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
-            }
+            if (parameter is not ContentPage page) return;
+            
+            await page.Navigation.PushAsync(new ProductListPage { SearchQuery = SearchQuery });
         }
 
         [RelayCommand]
@@ -132,57 +80,31 @@ namespace ClothingStoreApp.ViewModels
         {
             if (Categories == null || !Categories.Any())
             {
-                System.Diagnostics.Debug.WriteLine($"NavigateToCategory: Categories is null or empty for CategoryID={categoryId}");
                 await Application.Current.MainPage.DisplayAlert("Lỗi", "Không có danh mục nào được tải.", "OK");
                 return;
             }
 
             var category = Categories.FirstOrDefault(c => c.CategoryID == categoryId);
             string categoryName = category?.CategoryName ?? "Danh mục";
-            try
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToCategory: Navigating to ProductListPage with CategoryID={categoryId}, Name='{categoryName}'");
-                await Application.Current.MainPage.Navigation.PushAsync(new ProductListPage { CategoryId = categoryId.ToString(), CategoryName = categoryName });
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToCategory Error: CategoryID={categoryId}, Message={ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
-            }
+            
+            await Application.Current.MainPage.Navigation.PushAsync(new ProductListPage 
+            { 
+                CategoryId = categoryId.ToString(), 
+                CategoryName = categoryName 
+            });
         }
+
         [RelayCommand]
         private async Task NavigateToCart(object parameter)
         {
-            if (parameter is not ContentPage)
-            {
-                System.Diagnostics.Debug.WriteLine("NavigateToCart: Parameter is not ContentPage");
-                return;
-            }
-
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("NavigateToCart: Navigating to CartPage");
-                await Application.Current.MainPage.Navigation.PushAsync(new CartPage());
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToCart Error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
-            }
+            if (parameter is not ContentPage) return;
+            await Application.Current.MainPage.Navigation.PushAsync(new CartPage());
         }
+
         [RelayCommand]
         private async Task NavigateToProfile(object parameter)
         {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("NavigateToProfile: Navigating to ProfilePage");
-                await Application.Current.MainPage.Navigation.PushAsync(new ProfilePage());
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToProfile Error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
-            }
+            await Application.Current.MainPage.Navigation.PushAsync(new ProfilePage());
         }
     }
 }

@@ -22,58 +22,38 @@ namespace ClothingStoreApp.ViewModels
         {
             _sqlService = sqlService;
             CartItems = new ObservableCollection<CartItemViewModel>();
-            System.Diagnostics.Debug.WriteLine("CartViewModel: Initialized");
         }
 
         public void LoadCartItems()
         {
             CartItems.Clear();
-            if (!App.CurrentUserId.HasValue)
-            {
-                System.Diagnostics.Debug.WriteLine("LoadCartItems: No user logged in, UserID is null");
-                return;
-            }
+            if (!App.CurrentUserId.HasValue) return;
 
-            try
-            {
-                System.Diagnostics.Debug.WriteLine($"LoadCartItems: Fetching items for UserID={App.CurrentUserId.Value}");
-                var cartItems = _sqlService.GetCartItems(App.CurrentUserId.Value);
-                if (cartItems == null || !cartItems.Any())
-                {
-                    System.Diagnostics.Debug.WriteLine($"LoadCartItems: No items found for UserID={App.CurrentUserId.Value}");
-                    return;
-                }
+            var cartItems = _sqlService.GetCartItems(App.CurrentUserId.Value);
+            if (cartItems == null || !cartItems.Any()) return;
 
-                foreach (var item in cartItems)
+            foreach (var item in cartItems)
+            {
+                if (item.Product == null)
                 {
-                    if (item.Product == null)
+                    var placeholderProduct = new Product
                     {
-                        System.Diagnostics.Debug.WriteLine($"LoadCartItems: Adding placeholder for UserID={item.Cart.UserID}, ProductID={item.Cart.ProductID} due to missing product");
-                        var placeholderProduct = new Product
-                        {
-                            ProductID = item.Cart.ProductID,
-                            ProductName = $"Sản phẩm không tồn tại (ID: {item.Cart.ProductID})",
-                            Price = 0,
-                            ImageURL = "resources/images/placeholder.png"
-                        };
-                        var viewModel = new CartItemViewModel(item.Cart, placeholderProduct, _sqlService, this);
-                        viewModel.PropertyChanged += CartItem_PropertyChanged;
-                        CartItems.Add(viewModel);
-                        continue;
-                    }
-                    var cartItemViewModel = new CartItemViewModel(item.Cart, item.Product, _sqlService, this);
-                    cartItemViewModel.PropertyChanged += CartItem_PropertyChanged;
-                    CartItems.Add(cartItemViewModel);
-                    System.Diagnostics.Debug.WriteLine($"LoadCartItems: Added item ProductID={item.Cart.ProductID}, Quantity={item.Cart.Quantity}, ProductName={item.Product.ProductName}");
+                        ProductID = item.Cart.ProductID,
+                        ProductName = $"Sản phẩm không tồn tại (ID: {item.Cart.ProductID})",
+                        Price = 0,
+                        ImageURL = "resources/images/placeholder.png"
+                    };
+                    var viewModel = new CartItemViewModel(item.Cart, placeholderProduct, _sqlService, this);
+                    viewModel.PropertyChanged += CartItem_PropertyChanged;
+                    CartItems.Add(viewModel);
+                    continue;
                 }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"LoadCartItems Error: {ex.Message}");
+                var cartItemViewModel = new CartItemViewModel(item.Cart, item.Product, _sqlService, this);
+                cartItemViewModel.PropertyChanged += CartItem_PropertyChanged;
+                CartItems.Add(cartItemViewModel);
             }
 
             UpdateTotalPrice();
-            System.Diagnostics.Debug.WriteLine($"LoadCartItems: Loaded {CartItems.Count} items for UserID={App.CurrentUserId.Value}");
         }
 
         private void CartItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -87,7 +67,6 @@ namespace ClothingStoreApp.ViewModels
         private void UpdateTotalPrice()
         {
             TotalCartPrice = CartItems.Sum(item => item.TotalPrice);
-            System.Diagnostics.Debug.WriteLine($"UpdateTotalPrice: TotalCartPrice={TotalCartPrice:C0}");
         }
 
         [RelayCommand]
@@ -95,137 +74,72 @@ namespace ClothingStoreApp.ViewModels
         {
             if (!App.CurrentUserId.HasValue)
             {
-                System.Diagnostics.Debug.WriteLine("PlaceOrder: No user logged in");
                 await Application.Current.MainPage.DisplayAlert("Lỗi", "Vui lòng đăng nhập để đặt hàng.", "OK");
                 return;
             }
 
             if (!CartItems.Any())
             {
-                System.Diagnostics.Debug.WriteLine("PlaceOrder: Cart is empty");
                 await Application.Current.MainPage.DisplayAlert("Lỗi", "Giỏ hàng trống.", "OK");
                 return;
             }
 
-            try
-            {
-                await Application.Current.MainPage.Navigation.PushModalAsync(new ConfirmationModalPage(this));
-                System.Diagnostics.Debug.WriteLine("PlaceOrder: Showing confirmation modal page");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"PlaceOrder Error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể hiển thị xác nhận đơn hàng.", "OK");
-            }
+            await Application.Current.MainPage.Navigation.PushModalAsync(new ConfirmationModalPage(this));
         }
 
         public async Task ConfirmOrderAsync(string address)
         {
             if (!App.CurrentUserId.HasValue || string.IsNullOrWhiteSpace(address))
             {
-                System.Diagnostics.Debug.WriteLine("ConfirmOrderAsync: Invalid user or address");
                 await Application.Current.MainPage.DisplayAlert("Lỗi", "Thông tin không hợp lệ.", "OK");
                 return;
             }
 
-            try
+            int orderId = _sqlService.PlaceOrder(App.CurrentUserId.Value, TotalCartPrice, address);
+            if (orderId > 0)
             {
-                int orderId = _sqlService.PlaceOrder(App.CurrentUserId.Value, TotalCartPrice, address);
-                if (orderId > 0)
+                foreach (var item in CartItems)
                 {
-                    foreach (var item in CartItems)
-                    {
-                        _sqlService.AddOrderDetail(orderId, item.Product.ProductID, item.Quantity, item.Product.Price);
-                    }
-                    _sqlService.ClearCart(App.CurrentUserId.Value);
-                    CartItems.Clear();
-                    UpdateTotalPrice();
-                    await Application.Current.MainPage.DisplayAlert("Thông báo", "Đơn hàng đã được đặt thành công!", "OK");
-                    System.Diagnostics.Debug.WriteLine($"ConfirmOrderAsync: Order placed, OrderID={orderId}, TotalAmount={TotalCartPrice}");
+                    _sqlService.AddOrderDetail(orderId, item.Product.ProductID, item.Quantity, item.Product.Price);
                 }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("ConfirmOrderAsync: Failed to place order");
-                    await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể đặt hàng.", "OK");
-                }
+                _sqlService.ClearCart(App.CurrentUserId.Value);
+                CartItems.Clear();
+                UpdateTotalPrice();
+                await Application.Current.MainPage.DisplayAlert("Thông báo", "Đơn hàng đã được đặt thành công!", "OK");
             }
-            catch (Exception ex)
+            else
             {
-                System.Diagnostics.Debug.WriteLine($"ConfirmOrderAsync Error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", "Có lỗi xảy ra khi đặt hàng.", "OK");
+                await Application.Current.MainPage.DisplayAlert("Lỗi", "Không thể đặt hàng.", "OK");
             }
         }
 
         [RelayCommand]
         private async Task NavigateToHome()
         {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("NavigateToHome: Navigating to HomePage");
-                await Application.Current.MainPage.Navigation.PushAsync(new HomePage());
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToHome Error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
-            }
+            await Application.Current.MainPage.Navigation.PushAsync(new HomePage());
         }
 
         [RelayCommand]
         private async Task NavigateToProfile(object parameter)
         {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("NavigateToProfile: Navigating to ProfilePage");
-                await Application.Current.MainPage.Navigation.PushAsync(new ProfilePage());
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToProfile Error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
-            }
+            await Application.Current.MainPage.Navigation.PushAsync(new ProfilePage());
         }
 
         [RelayCommand]
         private async Task NavigateToWishlist()
         {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("NavigateToWishlist: Navigating to WishlistPage");
-                await Application.Current.MainPage.Navigation.PushAsync(new WishlistPage());
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"NavigateToWishlist Error: {ex.Message}");
-                await Application.Current.MainPage.DisplayAlert("Lỗi", $"Lỗi điều hướng: {ex.Message}", "OK");
-            }
+            await Application.Current.MainPage.Navigation.PushAsync(new WishlistPage());
         }
 
         public void RemoveCartItem(CartItemViewModel item)
         {
-            if (item == null || !App.CurrentUserId.HasValue)
-            {
-                System.Diagnostics.Debug.WriteLine("RemoveCartItem: Invalid item or no user logged in");
-                return;
-            }
+            if (item == null || !App.CurrentUserId.HasValue) return;
 
-            try
+            bool success = _sqlService.RemoveFromCart(App.CurrentUserId.Value, item.Product.ProductID);
+            if (success)
             {
-                bool success = _sqlService.RemoveFromCart(App.CurrentUserId.Value, item.Product.ProductID);
-                if (success)
-                {
-                    CartItems.Remove(item);
-                    UpdateTotalPrice();
-                    System.Diagnostics.Debug.WriteLine($"RemoveCartItem: Removed ProductID={item.Product.ProductID}, NewCount={CartItems.Count}");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"RemoveCartItem: Failed to remove ProductID={item.Product.ProductID}");
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"RemoveCartItem Error: ProductID={item.Product.ProductID}, Error={ex.Message}");
+                CartItems.Remove(item);
+                UpdateTotalPrice();
             }
         }
     }
@@ -253,28 +167,18 @@ namespace ClothingStoreApp.ViewModels
             Product = product;
             Quantity = cartItem.Quantity;
             UpdateTotalPrice();
-            System.Diagnostics.Debug.WriteLine($"CartItemViewModel: Initialized for ProductID={cartItem.ProductID}, Quantity={cartItem.Quantity}");
         }
 
         public IRelayCommand DeleteCommand => new RelayCommand(DeleteItem);
 
         private void DeleteItem()
         {
-            if (_parentViewModel != null)
-            {
-                _parentViewModel.RemoveCartItem(this);
-                System.Diagnostics.Debug.WriteLine($"DeleteItem: Removed ProductID={Product.ProductID}");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine($"DeleteItem: ParentViewModel is null for ProductID={Product.ProductID}");
-            }
+            _parentViewModel?.RemoveCartItem(this);
         }
 
         private void UpdateTotalPrice()
         {
             TotalPrice = Product.Price * Quantity;
-            System.Diagnostics.Debug.WriteLine($"UpdateTotalPrice: ProductID={Product.ProductID}, Quantity={Quantity}, TotalPrice={TotalPrice:C0}");
         }
 
         [RelayCommand]
@@ -285,7 +189,6 @@ namespace ClothingStoreApp.ViewModels
                 Quantity++;
                 UpdateCart();
                 UpdateTotalPrice();
-                System.Diagnostics.Debug.WriteLine($"IncreaseQuantity: ProductID={Product.ProductID}, Quantity={Quantity}");
             }
         }
 
@@ -297,43 +200,24 @@ namespace ClothingStoreApp.ViewModels
                 Quantity--;
                 UpdateCart();
                 UpdateTotalPrice();
-                System.Diagnostics.Debug.WriteLine($"DecreaseQuantity: ProductID={Product.ProductID}, Quantity={Quantity}");
             }
         }
 
         partial void OnQuantityChanged(int value)
         {
             if (value < 1)
-            {
                 Quantity = 1;
-                System.Diagnostics.Debug.WriteLine($"OnQuantityChanged: ProductID={Product.ProductID}, Quantity set to minimum 1");
-            }
             else if (value > 100)
-            {
                 Quantity = 100;
-                System.Diagnostics.Debug.WriteLine($"OnQuantityChanged: ProductID={Product.ProductID}, Quantity set to maximum 100");
-            }
+            
             UpdateCart();
             UpdateTotalPrice();
         }
 
         private void UpdateCart()
         {
-            if (!App.CurrentUserId.HasValue)
-            {
-                System.Diagnostics.Debug.WriteLine($"UpdateCart: No user logged in for ProductID={Product.ProductID}");
-                return;
-            }
-
-            try
-            {
-                bool success = _sqlService.UpdateCartItem(App.CurrentUserId.Value, Product.ProductID, Quantity);
-                System.Diagnostics.Debug.WriteLine($"UpdateCart: ProductID={Product.ProductID}, Quantity={Quantity}, Success={success}");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"UpdateCart Error: ProductID={Product.ProductID}, Error={ex.Message}");
-            }
+            if (!App.CurrentUserId.HasValue) return;
+            _sqlService.UpdateCartItem(App.CurrentUserId.Value, Product.ProductID, Quantity);
         }
     }
 }

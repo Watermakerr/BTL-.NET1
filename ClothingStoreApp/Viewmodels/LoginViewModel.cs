@@ -30,7 +30,6 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     private async Task Login(object parameter)
     {
-        // parameter là ContentPage được truyền từ XAML
         if (parameter is not ContentPage page)
         {
             ErrorMessage = "Lỗi điều hướng.";
@@ -72,7 +71,6 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     private async Task GoToRegister(object parameter)
     {
-        // parameter là ContentPage được truyền từ XAML
         if (parameter is not ContentPage page)
         {
             ErrorMessage = "Lỗi điều hướng.";
